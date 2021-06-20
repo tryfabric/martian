@@ -1,6 +1,7 @@
-import * as md from '../markdown';
-import * as notion from '../notion';
-import {parseBlocks} from './internal';
+import * as md from '../src/markdown';
+import {text} from '../src/markdown';
+import * as notion from '../src/notion';
+import {parseBlocks, parseRichText} from '../src/parser/internal';
 
 describe('gfm parser', () => {
   it('should parse paragraph with nested annotations', () => {
@@ -207,6 +208,27 @@ describe('gfm parser', () => {
       ]),
       notion.toDo(false, [notion.richText('to do')]),
       notion.toDo(true, [notion.richText('done')]),
+    ];
+
+    expect(actual).toStrictEqual(expected);
+  });
+
+  it('should parse rich text', () => {
+    const ast = md.root(
+      md.paragraph(
+        md.text('a'),
+        md.strong(md.emphasis(md.text('b')), md.text('c')),
+        md.link('https://example.com', text('d'))
+      )
+    );
+
+    const actual = parseRichText(ast);
+
+    const expected = [
+      notion.richText('a'),
+      notion.richText('b', {annotations: {italic: true, bold: true}}),
+      notion.richText('c', {annotations: {bold: true}}),
+      notion.richText('d', {url: 'https://example.com'}),
     ];
 
     expect(actual).toStrictEqual(expected);

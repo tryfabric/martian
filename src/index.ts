@@ -1,8 +1,8 @@
 import unified from 'unified';
 import markdown from 'remark-parse';
-import * as notion from './notion';
-import {parseBlocks} from './parser/internal';
-import * as md from './markdown';
+import type * as notion from './notion';
+import {parseBlocks, parseRichText} from './parser/internal';
+import type * as md from './markdown';
 import gfm from 'remark-gfm';
 
 /**
@@ -26,4 +26,16 @@ export function markdownToBlocks(body: string): notion.Block[] {
   const root = unified().use(markdown).use(gfm).parse(body);
 
   return parseBlocks(root as unknown as md.Root);
+}
+
+/**
+ * Parses inline Markdown content into Notion RichText objects.
+ * Only supports plain text, italics, bold, strikethrough, inline code, and hyperlinks.
+ *
+ * @param text any inline Markdown or GFM content
+ */
+export function markdownToRichText(text: string): notion.RichText[] {
+  const root = unified().use(markdown).use(gfm).parse(text);
+
+  return parseRichText(root as unknown as md.Root);
 }

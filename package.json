@@ -1,7 +1,7 @@
 {
   "name": "markdown-to-notion",
   "version": "1.0.0",
-  "description": "",
+  "description": "Converts Markdown to Notion Blocks and RichText",
   "main": "index.js",
   "scripts": {
     "test": "jest",
@@ -13,8 +13,13 @@
     "pretest": "npm run compile",
     "posttest": "npm run lint"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "markdown",
+    "notion",
+    "parser",
+    "gfm"
+  ],
+  "author": "Richard Robinson",
   "license": "ISC",
   "dependencies": {
     "@notionhq/client": "^0.1.9",
