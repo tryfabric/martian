@@ -26,6 +26,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
-    - run: npm pretest
+    - run: npm run pretest
     - run: npm test
-    - run: npm posttest
+    - run: npm run posttest
