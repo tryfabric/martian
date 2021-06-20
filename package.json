@@ -4,7 +4,7 @@
   "description": "Converts Markdown to Notion Blocks and RichText",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "./node_modules/.bin/jest",
     "lint": "gts lint",
     "clean": "gts clean",
     "compile": "tsc",
