@@ -1,6 +1,6 @@
 {
   "name": "@rrcodes/martian",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Converts Markdown to Notion Blocks and RichText",
   "repository": "https://github.com/rr-codes/martian",
   "main": "index.js",
