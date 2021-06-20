@@ -21,7 +21,7 @@ Designed to make using the Notion SDK and API easier.
 ## Usage
 
 ```ts
-import {markdownToBlocks, markdownToRichText} from '@rr-codes/martian';
+import {markdownToBlocks, markdownToRichText} from '@rrcodes/martian';
 import type {RichText, Block} from '@notionhq/client/build/src/api-types';
 
 const richText: RichText[] = markdownToRichText(`**Hello _world_**`);

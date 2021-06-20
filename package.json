@@ -1,7 +1,8 @@
 {
-  "name": "markdown-to-notion",
+  "name": "@rrcodes/martian",
   "version": "1.0.0",
   "description": "Converts Markdown to Notion Blocks and RichText",
+  "repository": "https://github.com/rr-codes/martian",
   "main": "index.js",
   "scripts": {
     "test": "jest",
