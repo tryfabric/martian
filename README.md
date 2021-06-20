@@ -2,6 +2,7 @@
 
 > Convert Markdown and GitHub Flavoured Markdown to Notion API Blocks and RichText
 
+[![Node.js CI](https://github.com/rr-codes/martian/actions/workflows/ci.yml/badge.svg)](https://github.com/rr-codes/martian/actions/workflows/ci.yml)
 [![Code Style: Google](https://img.shields.io/badge/code%20style-google-blueviolet.svg)](https://github.com/google/gts)
 
 Martian is a Markdown parser to convert any Markdown content to Notion API block or RichText objects. It
