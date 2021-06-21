@@ -1,8 +1,8 @@
 {
-  "name": "@rrcodes/martian",
-  "version": "1.0.1",
+  "name": "@instantish/martian",
+  "version": "1.0.2",
   "description": "Converts Markdown to Notion Blocks and RichText",
-  "repository": "https://github.com/rr-codes/martian",
+  "repository": "https://github.com/instantish/martian",
   "main": "index.js",
   "scripts": {
     "test": "jest",
