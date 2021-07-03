@@ -94,3 +94,7 @@ const blocks: Block[] = markdownToBlocks(`
 //   }
 // ]
 ```
+
+---
+
+Built with 💙 by the team behind [Fabric](https://tryfabric.com).
