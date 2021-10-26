@@ -80,7 +80,7 @@ function parseList(
 )[] {
   return element.children.flatMap(item => {
     const paragraph = item.children[0];
-    if (paragraph.type !== 'paragraph') {
+    if (paragraph === undefined || paragraph.type !== 'paragraph') {
       return [] as (
         | notion.BulletedListItemBlock
         | notion.NumberedListItemBlock
