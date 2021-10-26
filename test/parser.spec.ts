@@ -1,7 +1,7 @@
 import * as md from '../src/markdown';
-import {text} from '../src/markdown';
+import { text } from '../src/markdown';
 import * as notion from '../src/notion';
-import {parseBlocks, parseRichText} from '../src/parser/internal';
+import { parseBlocks, parseRichText } from '../src/parser/internal';
 
 describe('gfm parser', () => {
   it('should parse paragraph with nested annotations', () => {
@@ -20,14 +20,14 @@ describe('gfm parser', () => {
       notion.paragraph([
         notion.richText('Hello '),
         notion.richText('world ', {
-          annotations: {italic: true},
+          annotations: { italic: true },
         }),
         notion.richText('foo', {
-          annotations: {italic: true, bold: true},
+          annotations: { italic: true, bold: true },
         }),
         notion.richText('! '),
         notion.richText('code', {
-          annotations: {code: true},
+          annotations: { code: true },
         }),
       ]),
     ];
@@ -57,7 +57,7 @@ describe('gfm parser', () => {
           url: 'https://example.com',
         }),
         notion.richText('url', {
-          annotations: {italic: true},
+          annotations: { italic: true },
           url: 'https://example.com',
         }),
         notion.richText(' end'),
@@ -116,7 +116,7 @@ describe('gfm parser', () => {
       notion.paragraph([notion.richText('hello')]),
       notion.paragraph([
         notion.richText('public class Foo {}', {
-          annotations: {code: true},
+          annotations: { code: true },
         }),
       ]),
     ];
@@ -137,7 +137,7 @@ describe('gfm parser', () => {
       notion.headingOne([
         notion.richText('hello '),
         notion.richText('world', {
-          annotations: {italic: true},
+          annotations: { italic: true },
         }),
       ]),
     ];
@@ -162,12 +162,40 @@ describe('gfm parser', () => {
       notion.paragraph([notion.richText('hello')]),
       notion.bulletedListItem([notion.richText('a')]),
       notion.bulletedListItem([
-        notion.richText('b', {annotations: {italic: true}}),
+        notion.richText('b', { annotations: { italic: true } }),
       ]),
       notion.bulletedListItem([
-        notion.richText('c', {annotations: {bold: true}}),
+        notion.richText('c', { annotations: { bold: true } }),
       ]),
       notion.numberedListItem([notion.richText('d')]),
+    ];
+
+    expect(actual).toStrictEqual(expected);
+  });
+
+  it('should parse empty list items', () => {
+    const ast = md.root(
+      md.paragraph(md.text('hello')),
+      md.unorderedList(
+        md.listItem(md.paragraph(md.text(''))),
+        md.listItem(md.paragraph(md.text(''))),
+        md.listItem(md.paragraph(md.text('')))
+      ),
+      md.orderedList(md.listItem(md.paragraph(md.text(''))))
+    );
+
+    const actual = parseBlocks(ast);
+
+    const expected = [
+      notion.paragraph([notion.richText('hello')]),
+      notion.bulletedListItem([notion.richText('')]),
+      notion.bulletedListItem([
+        notion.richText(''),
+      ]),
+      notion.bulletedListItem([
+        notion.richText(''),
+      ]),
+      notion.numberedListItem([notion.richText('')]),
     ];
 
     expect(actual).toStrictEqual(expected);
@@ -203,7 +231,7 @@ describe('gfm parser', () => {
       ]),
       notion.paragraph([
         notion.richText('strikethrough content', {
-          annotations: {strikethrough: true},
+          annotations: { strikethrough: true },
         }),
       ]),
       notion.toDo(false, [notion.richText('to do')]),
@@ -226,9 +254,9 @@ describe('gfm parser', () => {
 
     const expected = [
       notion.richText('a'),
-      notion.richText('b', {annotations: {italic: true, bold: true}}),
-      notion.richText('c', {annotations: {bold: true}}),
-      notion.richText('d', {url: 'https://example.com'}),
+      notion.richText('b', { annotations: { italic: true, bold: true } }),
+      notion.richText('c', { annotations: { bold: true } }),
+      notion.richText('d', { url: 'https://example.com' }),
     ];
 
     expect(actual).toStrictEqual(expected);
