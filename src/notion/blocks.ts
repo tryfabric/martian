@@ -3,6 +3,7 @@ import type {
   HeadingOneBlock,
   HeadingThreeBlock,
   HeadingTwoBlock,
+  ImageBlock,
   NumberedListItemBlock,
   ParagraphBlock,
   RichText,
@@ -78,4 +79,17 @@ export function toDo(checked: boolean, text: RichText[]): ToDoBlock {
       checked: checked,
     },
   } as ToDoBlock;
+}
+
+export function image(url: string) {
+  return {
+    object: 'block',
+    type: 'image',
+    image: {
+      type: 'external',
+      external: {
+        url: url
+      }
+    }
+  } as ImageBlock;
 }

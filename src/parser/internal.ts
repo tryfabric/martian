@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import * as md from '../markdown';
 import * as notion from '../notion';
 
@@ -67,7 +68,7 @@ function parseHeading(
 }
 
 function parseCode(element: md.Code): notion.ParagraphBlock {
-  const text = [notion.richText(element.value, {annotations: {code: true}})];
+  const text = [notion.richText(element.value, { annotations: { code: true } })];
   return notion.paragraph(text);
 }
 
@@ -105,8 +106,27 @@ function parseNode(node: md.FlowContent): notion.Block[] {
     case 'heading':
       return [parseHeading(node)];
 
-    case 'paragraph':
-      return [parseParagraph(node)];
+    case 'paragraph': {
+      const imageElement = node.children.filter((child) => child.type === 'image')
+      if (imageElement.length) {
+        node.children.forEach((child, index) => {
+          if (child.type === 'image') {
+            delete node.children[index];
+          }
+        })
+        const imageBlocks = imageElement.map((element) => {
+          if (element.type === 'image') {
+            return notion.image(element.url)
+          } else {
+            return notion.image('')
+          }
+        })
+        return [...imageBlocks, parseParagraph(node)]
+      } else {
+        return [parseParagraph(node)];
+      }
+    }
+
 
     case 'code':
       return [parseCode(node)];
