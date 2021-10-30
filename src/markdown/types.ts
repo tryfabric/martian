@@ -96,7 +96,7 @@ export interface Link extends Parent, Resource {
   children: StaticPhrasingContent[];
 }
 
-export interface Image extends Node, Resource {
+export interface Image extends Resource {
   type: 'image';
 }
 
@@ -143,6 +143,8 @@ export type FlowContent =
   | Heading
   | HTML
   | List
+  | Image
+  | ImageReference
   | ThematicBreak
   | Content
   | Table;
@@ -154,10 +156,10 @@ export type ListContent = ListItem;
 export type PhrasingContent = Link | LinkReference | StaticPhrasingContent;
 
 export type StaticPhrasingContent =
+  | Image
   | Break
   | Emphasis
   | HTML
-  | Image
   | ImageReference
   | InlineCode
   | Strong

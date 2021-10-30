@@ -21,10 +21,13 @@
     "parser",
     "gfm"
   ],
+  "engines": {
+    "node": ">=15"
+  },
   "author": "Richard Robinson",
   "license": "ISC",
   "dependencies": {
-    "@notionhq/client": "^0.1.9",
+    "@notionhq/client": "^0.4.4",
     "remark-gfm": "^1.0.0",
     "remark-parse": "^9.0.0",
     "unified": "^9.2.1"

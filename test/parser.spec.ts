@@ -114,33 +114,18 @@ describe('gfm parser', () => {
 
     const expected = [
       notion.paragraph([notion.richText('hello')]),
-      notion.paragraph([
-        notion.richText('public class Foo {}', {
-          annotations: {code: true},
-        }),
-      ]),
+      notion.code([notion.richText('public class Foo {}')]),
     ];
 
     expect(actual).toStrictEqual(expected);
   });
 
   it('should parse block quote', () => {
-    const ast = md.root(
-      md.blockquote(
-        md.heading(1, md.text('hello '), md.emphasis(md.text('world')))
-      )
-    );
+    const ast = md.root(md.blockquote(md.paragraph(md.text('hello'))));
 
     const actual = parseBlocks(ast);
 
-    const expected = [
-      notion.headingOne([
-        notion.richText('hello '),
-        notion.richText('world', {
-          annotations: {italic: true},
-        }),
-      ]),
-    ];
+    const expected = [notion.blockquote([notion.richText('hello')])];
 
     expect(actual).toStrictEqual(expected);
   });

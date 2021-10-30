@@ -5,6 +5,7 @@ import type {
   Emphasis,
   FlowContent,
   Heading,
+  Image,
   InlineCode,
   Link,
   List,
@@ -26,6 +27,14 @@ export function text(value: string): Text {
   return {
     type: 'text',
     value: value,
+  };
+}
+
+export function image(url: string, alt: string, title: string): Image {
+  return {
+    type: 'image',
+    url: url,
+    title: title,
   };
 }
 

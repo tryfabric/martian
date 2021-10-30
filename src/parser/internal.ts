@@ -1,5 +1,11 @@
 import * as md from '../markdown';
 import * as notion from '../notion';
+import {URL} from 'url';
+
+function ensureLength(text: string, copy?: object) {
+  const chunks = text.match(/[^]{1,2000}/g) || [];
+  return chunks.flatMap((item: string) => notion.richText(item, copy));
+}
 
 function parseInline(
   element: md.PhrasingContent,
@@ -13,11 +19,8 @@ function parseInline(
   };
 
   switch (element.type) {
-    case 'image':
-      return [notion.richText(element.title ?? element.url, copy)];
-
     case 'text':
-      return [notion.richText(element.value, copy)];
+      return ensureLength(element.value, copy);
 
     case 'delete':
       copy.annotations.strikethrough = true;
@@ -44,14 +47,47 @@ function parseInline(
   }
 }
 
-function parseParagraph(element: md.Paragraph): notion.ParagraphBlock {
+function parseParagraph(element: md.Paragraph): notion.Block {
+  // Paragraphs can contain inline elements that
+  // If a paragraph only contains one image child
+  const isImage = element.children[0].type === 'image';
+  if (isImage) {
+    const image = element.children[0] as md.Image;
+    try {
+      new URL(image.url);
+      return notion.image(image.url);
+    } catch (error) {
+      console.log(
+        `${error.input} is not a valid url, I will process this as text for you to fix later`
+      );
+    }
+  }
+
+  // Paragraphs can also be legacy 'TOC' from some markdown
+  const mightBeToc =
+    element.children.length > 2 &&
+    element.children[0].type === 'text' &&
+    element.children[0].value === '[[' &&
+    element.children[1].type === 'emphasis';
+  if (mightBeToc) {
+    const emphasisItem = element.children[1] as md.Emphasis;
+    const emphasisTextItem = emphasisItem.children[0] as md.Text;
+    if (emphasisTextItem.value === 'TOC') {
+      return notion.table_of_contents();
+    }
+  }
+
   const text = element.children.flatMap(child => parseInline(child));
   return notion.paragraph(text);
 }
 
-function parseHeading(
-  element: md.Heading
-): notion.HeadingOneBlock | notion.HeadingTwoBlock | notion.HeadingThreeBlock {
+function parseBlockquote(element: md.Blockquote): notion.Block {
+  const blocks = element.children.flatMap(child => parseNode(child));
+  const paragraph = blocks[0].paragraph as notion.RichText;
+  return notion.blockquote(paragraph.text as notion.RichText[]);
+}
+
+function parseHeading(element: md.Heading): notion.Block {
   const text = element.children.flatMap(child => parseInline(child));
 
   switch (element.depth) {
@@ -66,26 +102,16 @@ function parseHeading(
   }
 }
 
-function parseCode(element: md.Code): notion.ParagraphBlock {
-  const text = [notion.richText(element.value, {annotations: {code: true}})];
-  return notion.paragraph(text);
+function parseCode(element: md.Code): notion.Block {
+  const text = ensureLength(element.value);
+  return notion.code(text);
 }
 
-function parseList(
-  element: md.List
-): (
-  | notion.BulletedListItemBlock
-  | notion.NumberedListItemBlock
-  | notion.ToDoBlock
-)[] {
+function parseList(element: md.List): notion.Block[] {
   return element.children.flatMap(item => {
     const paragraph = item.children[0];
-    if (paragraph.type !== 'paragraph') {
-      return [] as (
-        | notion.BulletedListItemBlock
-        | notion.NumberedListItemBlock
-        | notion.ToDoBlock
-      )[];
+    if (paragraph === undefined || paragraph.type !== 'paragraph') {
+      return [] as notion.Block[];
     }
 
     const text = paragraph.children.flatMap(child => parseInline(child));
@@ -112,7 +138,7 @@ function parseNode(node: md.FlowContent): notion.Block[] {
       return [parseCode(node)];
 
     case 'blockquote':
-      return node.children.flatMap(parseNode);
+      return [parseBlockquote(node)];
 
     case 'list':
       return parseList(node);
