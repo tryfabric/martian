@@ -23,6 +23,20 @@ hello _world_
     expect(expected).toStrictEqual(actual);
   });
 
+  it('should convert markdown to blocks - deal with broken lists', () => {
+    const text = `
+## broken list
+1. Hello
+2.
+`;
+    const actual = markdownToBlocks(text.toString());
+    const expected = [
+      notion.headingTwo([notion.richText('broken list')]),
+      notion.numberedListItem([notion.richText('Hello')]),
+    ];
+    expect(expected).toStrictEqual(actual);
+  });
+
   it('should convert markdown to rich text', () => {
     const text = 'hello [_url_](https://example.com)';
     const actual = markdownToRichText(text);
