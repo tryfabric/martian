@@ -109,19 +109,24 @@ function parseCode(element: md.Code): notion.Block {
 
 function parseList(element: md.List): notion.Block[] {
   return element.children.flatMap(item => {
-    const paragraph = item.children[0];
+    const paragraph = item.children.shift();
     if (paragraph === undefined || paragraph.type !== 'paragraph') {
       return [] as notion.Block[];
     }
 
     const text = paragraph.children.flatMap(child => parseInline(child));
 
+    // Now process any of the children
+    const parsedChildren: notion.Block[] = item.children.flatMap(child =>
+      parseNode(child)
+    );
+
     if (element.start !== null && element.start !== undefined) {
-      return [notion.numberedListItem(text)];
+      return [notion.numberedListItem(text, parsedChildren)];
     } else if (item.checked !== null && item.checked !== undefined) {
-      return [notion.toDo(item.checked, text)];
+      return [notion.toDo(item.checked, text, parsedChildren)];
     } else {
-      return [notion.bulletedListItem(text)];
+      return [notion.bulletedListItem(text, parsedChildren)];
     }
   });
 }

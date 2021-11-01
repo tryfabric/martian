@@ -67,6 +67,22 @@ const hello = "hello";
     expect(textArray.length).toStrictEqual(9);
   });
 
+  it('should convert markdown to blocks - deal with lists', () => {
+    const text = fs.readFileSync('test/fixtures/list.md').toString();
+    const actual = markdownToBlocks(text);
+
+    const expected = [
+      notion.headingOne([notion.richText('List')]),
+      notion.bulletedListItem(
+        [notion.richText('Item 1')],
+        [notion.bulletedListItem([notion.richText('Sub Item 1')])]
+      ),
+      notion.bulletedListItem([notion.richText('Item 2')]),
+    ];
+
+    expect(expected).toStrictEqual(actual);
+  });
+
   it('should convert markdown to rich text', () => {
     const text = 'hello [_url_](https://example.com)';
     const actual = markdownToRichText(text);

@@ -102,33 +102,46 @@ export function headingThree(text: RichText[]): Block {
   } as Block;
 }
 
-export function bulletedListItem(text: RichText[]): Block {
+export function bulletedListItem(
+  text: RichText[],
+  children: Block[] = []
+): Block {
   return {
     object: 'block',
     type: 'bulleted_list_item',
     bulleted_list_item: {
       text: text,
+      children: children.length ? children : undefined,
     },
   } as Block;
 }
 
-export function numberedListItem(text: RichText[]): Block {
+export function numberedListItem(
+  text: RichText[],
+  children: Block[] = []
+): Block {
   return {
     object: 'block',
     type: 'numbered_list_item',
     numbered_list_item: {
       text: text,
+      children: children.length ? children : undefined,
     },
   } as Block;
 }
 
-export function toDo(checked: boolean, text: RichText[]): Block {
+export function toDo(
+  checked: boolean,
+  text: RichText[],
+  children: Block[] = []
+): Block {
   return {
     object: 'block',
     type: 'to_do',
     to_do: {
       text: text,
       checked: checked,
+      children: children.length ? children : undefined,
     },
   } as Block;
 }
