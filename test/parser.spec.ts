@@ -121,11 +121,23 @@ describe('gfm parser', () => {
   });
 
   it('should parse block quote', () => {
-    const ast = md.root(md.blockquote(md.paragraph(md.text('hello'))));
+    const ast = md.root(
+      md.blockquote(
+        md.paragraph(md.text('hello')),
+        md.paragraph(md.emphasis(md.text('world')))
+      )
+    );
 
     const actual = parseBlocks(ast);
 
-    const expected = [notion.blockquote([notion.richText('hello')])];
+    const expected = [
+      notion.blockquote([
+        notion.richText('hello'),
+        notion.richText('world', {
+          annotations: {italic: true},
+        }),
+      ]),
+    ];
 
     expect(actual).toStrictEqual(expected);
   });

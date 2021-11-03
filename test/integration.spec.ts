@@ -87,9 +87,6 @@ const hello = "hello";
     const text = fs.readFileSync('test/fixtures/table.md').toString();
     const actual = markdownToBlocks(text, false);
     const expected = [notion.headingOne([notion.richText('Table')])];
-
-    console.log(JSON.stringify(actual, null, 2));
-
     expect(expected).toStrictEqual(actual);
   });
 

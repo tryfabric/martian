@@ -4,7 +4,7 @@
 export interface Block {
   object?: string;
   type?: string;
-  paragraph?: object;
+  paragraph?: ParagraphText;
   heading_1?: object;
   heading_2?: object;
   heading_3?: object;
@@ -12,6 +12,10 @@ export interface Block {
   quote?: object;
   bulleted_list_item?: object;
   numbered_list_item?: object;
+}
+
+export interface ParagraphText {
+  text: RichText[];
 }
 
 export interface RichText {

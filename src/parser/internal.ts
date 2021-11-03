@@ -83,8 +83,11 @@ function parseParagraph(element: md.Paragraph): notion.Block {
 
 function parseBlockquote(element: md.Blockquote): notion.Block {
   const blocks = element.children.flatMap(child => parseNode(child));
-  const paragraph = blocks[0].paragraph as notion.RichText;
-  return notion.blockquote(paragraph.text as notion.RichText[]);
+  const paragraphs = blocks.flatMap(child => child as notion.Block);
+  const richtext = paragraphs.flatMap(
+    child => child.paragraph?.text as notion.RichText[]
+  );
+  return notion.blockquote(richtext as notion.RichText[]);
 }
 
 function parseHeading(element: md.Heading): notion.Block {
