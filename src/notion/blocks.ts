@@ -4,17 +4,17 @@
 export interface Block {
   object?: string;
   type?: string;
-  paragraph?: ParagraphText;
-  heading_1?: object;
-  heading_2?: object;
-  heading_3?: object;
+  paragraph?: BlockText;
+  heading_1?: BlockText;
+  heading_2?: BlockText;
+  heading_3?: BlockText;
   image?: object;
   quote?: object;
   bulleted_list_item?: object;
   numbered_list_item?: object;
 }
 
-export interface ParagraphText {
+export interface BlockText {
   text: RichText[];
 }
 

@@ -123,8 +123,7 @@ describe('gfm parser', () => {
   it('should parse block quote', () => {
     const ast = md.root(
       md.blockquote(
-        md.paragraph(md.text('hello')),
-        md.paragraph(md.emphasis(md.text('world')))
+        md.heading(1, md.text('hello'), md.emphasis(md.text('world')))
       )
     );
 

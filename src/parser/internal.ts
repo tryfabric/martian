@@ -82,11 +82,25 @@ function parseParagraph(element: md.Paragraph): notion.Block {
 }
 
 function parseBlockquote(element: md.Blockquote): notion.Block {
+  // Quotes can only contain RichText[], but come through as Block[]
+  // This code collects and flattens the common ones
   const blocks = element.children.flatMap(child => parseNode(child));
   const paragraphs = blocks.flatMap(child => child as notion.Block);
-  const richtext = paragraphs.flatMap(
-    child => child.paragraph?.text as notion.RichText[]
-  );
+  const richtext = paragraphs.flatMap(child => {
+    if (child.paragraph) {
+      return child.paragraph.text as notion.RichText[];
+    }
+    if (child.heading_1) {
+      return child.heading_1.text as notion.RichText[];
+    }
+    if (child.heading_2) {
+      return child.heading_2.text as notion.RichText[];
+    }
+    if (child.heading_3) {
+      return child.heading_3.text as notion.RichText[];
+    }
+    return [];
+  });
   return notion.blockquote(richtext as notion.RichText[]);
 }
 
