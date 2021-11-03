@@ -56,7 +56,7 @@ function parseParagraph(element: md.Paragraph): notion.Block {
     try {
       new URL(image.url);
       return notion.image(image.url);
-    } catch (error) {
+    } catch (error: any) {
       console.log(
         `${error.input} is not a valid url, I will process this as text for you to fix later`
       );
