@@ -9,15 +9,210 @@ Martian is a Markdown parser to convert any Markdown content to Notion API block
 uses [unified](https://github.com/unifiedjs/unified) to create a Markdown AST, then converts the AST into Notion
 objects.
 
-Designed to make using the Notion SDK and API easier.
+Designed to make using the Notion SDK and API easier.  Notion API version 0.4.4.
 
 ### Supported Markdown Elements
 
 * All inline elements (italics, bold, strikethrough, inline code, hyperlinks)
-* Lists (ordered, unordered, checkboxes)
+* Lists (ordered, unordered, checkboxes) - to any level of depth
 * All headers (header levels >= 3 are treated as header level 3)
-* Code blocks (treated as paragraphs)
-* Block quotes (treated as paragraphs)
+* Code blocks
+* Block quotes
+* Images (where the image is the first element in the paragraph and it has a valid full URL)
+
+## Unsupported Markdown Elements
+
+*tables*: Tables can be imported in an 'unsupported mode' if you add a flag to the parser.
+
+First, the default mode - it ignores the tables:
+
+```ts
+const unsupported = false;
+const blocks: Block[] = markdownToBlocks(`
+# Table
+
+| First Header  | Second Header |
+| ------------- | ------------- |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+`, unsupported);
+
+// [
+//   {
+//     "object": "block",
+//     "type": "heading_1",
+//     "heading_1": {
+//       "text": [
+//         {
+//           "type": "text",
+//           "annotations": {
+//             "bold": false,
+//             "strikethrough": false,
+//             "underline": false,
+//             "italic": false,
+//             "code": false,
+//             "color": "default"
+//           },
+//           "text": {
+//             "content": "Table"
+//           }
+//         }
+//       ]
+//     }
+//   }
+// ]
+```
+
+Next, with unsupported flag = true (note I have removed the `annotations` from the returned object to make it easier to see what is going on):
+
+
+```ts
+const unsupported = true;
+const blocks: Block[] = markdownToBlocks(`
+# Table
+
+| First Header  | Second Header |
+| ------------- | ------------- |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+`, unsupported)
+
+ [
+//   {
+//     "object": "block",
+//     "type": "heading_1",
+//     "heading_1": {
+//       "text": [
+//         {
+//           "type": "text",
+//           "text": {
+//             "content": "Table"
+//           }
+//         }
+//       ]
+//     }
+//   },
+//   {
+//     "object": "unsupported",
+//     "type": "table",
+//     "table": {
+//       "children": [
+//         {
+//           "object": "unsupported",
+//           "type": "table_row",
+//           "table_row": {
+//             "children": [
+//               {
+//                 "object": "unsupported",
+//                 "type": "table_cell",
+//                 "table_cell": {
+//                   "children": [
+//                     {
+//                       "type": "text",
+//                       "text": {
+//                         "content": "First Header"
+//                       }
+//                     }
+//                   ]
+//                 }
+//               },
+//               {
+//                 "object": "unsupported",
+//                 "type": "table_cell",
+//                 "table_cell": {
+//                   "children": [
+//                     {
+//                       "type": "text",
+//                       "text": {
+//                         "content": "Second Header"
+//                       }
+//                     }
+//                   ]
+//                 }
+//               }
+//             ]
+//           }
+//         },
+//         {
+//           "object": "unsupported",
+//           "type": "table_row",
+//           "table_row": {
+//             "children": [
+//               {
+//                 "object": "unsupported",
+//                 "type": "table_cell",
+//                 "table_cell": {
+//                   "children": [
+//                     {
+//                       "type": "text",
+//                       "text": {
+//                         "content": "Content Cell"
+//                       }
+//                     }
+//                   ]
+//                 }
+//               },
+//               {
+//                 "object": "unsupported",
+//                 "type": "table_cell",
+//                 "table_cell": {
+//                   "children": [
+//                     {
+//                       "type": "text",
+//                       "text": {
+//                         "content": "Content Cell"
+//                       }
+//                     }
+//                   ]
+//                 }
+//               }
+//             ]
+//           }
+//         },
+//         {
+//           "object": "unsupported",
+//           "type": "table_row",
+//           "table_row": {
+//             "children": [
+//               {
+//                 "object": "unsupported",
+//                 "type": "table_cell",
+//                 "table_cell": {
+//                   "children": [
+//                     {
+//                       "type": "text",
+//                       "text": {
+//                         "content": "Content Cell"
+//                       }
+//                     }
+//                   ]
+//                 }
+//               },
+//               {
+//                 "object": "unsupported",
+//                 "type": "table_cell",
+//                 "table_cell": {
+//                   "children": [
+//                     {
+//                       "type": "text",
+//                       "text": {
+//                         "content": "Content Cell"
+//                       }
+//                     }
+//                   ]
+//                 }
+//               }
+//             ]
+//           }
+//         }
+//       ]
+//     }
+//   }
+// ]
+```
+
+Note that if you send this document to Notion with the current version of the API it *will* fail, but this allows you to pre-parse the blocks in your client library, and do something with the tables.  In one example, the tables are being parsed out of the blocks, databases being created, that are then linked back to the imported page:  https://github.com/infinitaslearning/notionater/blob/main/index.js#L81-L203
+
 
 ## Usage
 

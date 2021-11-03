@@ -145,3 +145,33 @@ export function toDo(
     },
   } as Block;
 }
+
+export function table(children: Block[] = []): Block {
+  return {
+    object: 'unsupported',
+    type: 'table',
+    table: {
+      children: children.length ? children : undefined,
+    },
+  } as Block;
+}
+
+export function tableRow(children: Block[] = []): Block {
+  return {
+    object: 'unsupported',
+    type: 'table_row',
+    table_row: {
+      children: children.length ? children : undefined,
+    },
+  } as Block;
+}
+
+export function tableCell(children: Block[] = []): Block {
+  return {
+    object: 'unsupported',
+    type: 'table_cell',
+    table_cell: {
+      children: children.length ? children : undefined,
+    },
+  } as Block;
+}

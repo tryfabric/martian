@@ -83,6 +83,40 @@ const hello = "hello";
     expect(expected).toStrictEqual(actual);
   });
 
+  it('should convert markdown to blocks - skip tables if unsupported = false', () => {
+    const text = fs.readFileSync('test/fixtures/table.md').toString();
+    const actual = markdownToBlocks(text, false);
+    const expected = [notion.headingOne([notion.richText('Table')])];
+
+    console.log(JSON.stringify(actual, null, 2));
+
+    expect(expected).toStrictEqual(actual);
+  });
+
+  it('should convert markdown to blocks - skip tables if unsupported = true', () => {
+    const text = fs.readFileSync('test/fixtures/table.md').toString();
+    const actual = markdownToBlocks(text, true);
+    const expected = [
+      notion.headingOne([notion.richText('Table')]),
+      notion.table([
+        notion.tableRow([
+          notion.tableCell([notion.richText('First Header')]),
+          notion.tableCell([notion.richText('Second Header')]),
+        ]),
+        notion.tableRow([
+          notion.tableCell([notion.richText('Content Cell')]),
+          notion.tableCell([notion.richText('Content Cell')]),
+        ]),
+        notion.tableRow([
+          notion.tableCell([notion.richText('Content Cell')]),
+          notion.tableCell([notion.richText('Content Cell')]),
+        ]),
+      ]),
+    ];
+
+    expect(expected).toStrictEqual(actual);
+  });
+
   it('should convert markdown to rich text', () => {
     const text = 'hello [_url_](https://example.com)';
     const actual = markdownToRichText(text);

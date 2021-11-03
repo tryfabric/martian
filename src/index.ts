@@ -22,9 +22,12 @@ import gfm from 'remark-gfm';
  *
  * @param body any Markdown or GFM content
  */
-export function markdownToBlocks(body: string): notion.Block[] {
+export function markdownToBlocks(
+  body: string,
+  unsupported = false
+): notion.Block[] {
   const root = unified().use(markdown).use(gfm).parse(body);
-  return parseBlocks(root as unknown as md.Root);
+  return parseBlocks(root as unknown as md.Root, unsupported);
 }
 
 /**
@@ -35,6 +38,5 @@ export function markdownToBlocks(body: string): notion.Block[] {
  */
 export function markdownToRichText(text: string): notion.RichText[] {
   const root = unified().use(markdown).use(gfm).parse(text);
-
   return parseRichText(root as unknown as md.Root);
 }

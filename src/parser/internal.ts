@@ -48,8 +48,8 @@ function parseInline(
 }
 
 function parseParagraph(element: md.Paragraph): notion.Block {
-  // Paragraphs can contain inline elements that
-  // If a paragraph only contains one image child
+  // If a paragraph containts an image element as its first element
+  // Lets assume it is an image, and parse it as only that (discard remaining content)
   const isImage = element.children[0].type === 'image';
   if (isImage) {
     const image = element.children[0] as md.Image;
@@ -131,7 +131,22 @@ function parseList(element: md.List): notion.Block[] {
   });
 }
 
-function parseNode(node: md.FlowContent): notion.Block[] {
+function parseTableCell(node: md.TableCell): notion.Block[] {
+  const text = node.children.flatMap(child => parseInline(child));
+  return [notion.tableCell(text)];
+}
+
+function parseTableRow(node: md.TableRow): notion.Block[] {
+  const tableCells = node.children.flatMap(child => parseTableCell(child));
+  return [notion.tableRow(tableCells)];
+}
+
+function parseTable(node: md.Table): notion.Block[] {
+  const tableRows = node.children.flatMap(child => parseTableRow(child));
+  return [notion.table(tableRows)];
+}
+
+function parseNode(node: md.FlowContent, unsupported = false): notion.Block[] {
   switch (node.type) {
     case 'heading':
       return [parseHeading(node)];
@@ -148,13 +163,23 @@ function parseNode(node: md.FlowContent): notion.Block[] {
     case 'list':
       return parseList(node);
 
+    case 'table':
+      if (unsupported) {
+        return parseTable(node);
+      } else {
+        return [];
+      }
+
     default:
       return [];
   }
 }
 
-export function parseBlocks(root: md.Root): notion.Block[] {
-  return root.children.flatMap(parseNode);
+export function parseBlocks(
+  root: md.Root,
+  unsupported = false
+): notion.Block[] {
+  return root.children.flatMap(item => parseNode(item, unsupported));
 }
 
 export function parseRichText(root: md.Root): notion.RichText[] {
