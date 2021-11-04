@@ -24,10 +24,10 @@ import gfm from 'remark-gfm';
  */
 export function markdownToBlocks(
   body: string,
-  unsupported = false
+  allowUnsupportedObjectType = false
 ): notion.Block[] {
   const root = unified().use(markdown).use(gfm).parse(body);
-  return parseBlocks(root as unknown as md.Root, unsupported);
+  return parseBlocks(root as unknown as md.Root, allowUnsupportedObjectType);
 }
 
 /**

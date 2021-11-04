@@ -9,7 +9,7 @@ Martian is a Markdown parser to convert any Markdown content to Notion API block
 uses [unified](https://github.com/unifiedjs/unified) to create a Markdown AST, then converts the AST into Notion
 objects.
 
-Designed to make using the Notion SDK and API easier.  Notion API version 0.4.4.
+Designed to make using the Notion SDK and API easier.  Notion API version 0.4.5.
 
 ### Supported Markdown Elements
 
@@ -22,12 +22,12 @@ Designed to make using the Notion SDK and API easier.  Notion API version 0.4.4.
 
 ## Unsupported Markdown Elements
 
-*tables*: Tables can be imported in an 'unsupported mode' if you add a flag to the parser.
+*tables*: Tables can be imported in an [unsupported mode](https://developers.notion.com/reference/block) if you add a flag to the parser.
 
 First, the default mode - it ignores the tables:
 
 ```ts
-const unsupported = false;
+const allowUnsupportedObjectType = false;
 const blocks: Block[] = markdownToBlocks(`
 # Table
 
@@ -35,7 +35,7 @@ const blocks: Block[] = markdownToBlocks(`
 | ------------- | ------------- |
 | Content Cell  | Content Cell  |
 | Content Cell  | Content Cell  |
-`, unsupported);
+`, allowUnsupportedObjectType);
 
 // [
 //   {
@@ -63,11 +63,11 @@ const blocks: Block[] = markdownToBlocks(`
 // ]
 ```
 
-Next, with unsupported flag = true (note I have removed the `annotations` from the returned object to make it easier to see what is going on):
+Next, with unsupported flag = true (note the `annotations` have been removed from the returned object to make it easier to see what is going on):
 
 
 ```ts
-const unsupported = true;
+const allowUnsupportedObjectType = true;
 const blocks: Block[] = markdownToBlocks(`
 # Table
 
@@ -75,7 +75,7 @@ const blocks: Block[] = markdownToBlocks(`
 | ------------- | ------------- |
 | Content Cell  | Content Cell  |
 | Content Cell  | Content Cell  |
-`, unsupported)
+`, allowUnsupportedObjectType)
 
  [
 //   {

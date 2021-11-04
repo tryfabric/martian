@@ -90,7 +90,7 @@ const hello = "hello";
     expect(expected).toStrictEqual(actual);
   });
 
-  it('should convert markdown to blocks - skip tables if unsupported = true', () => {
+  it('should convert markdown to blocks - include tables if unsupported = true', () => {
     const text = fs.readFileSync('test/fixtures/table.md').toString();
     const actual = markdownToBlocks(text, true);
     const expected = [
