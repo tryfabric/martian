@@ -1,7 +1,14 @@
-import type {Annotations, RichText} from '@notionhq/client/build/src/api-types';
+import type {RichText} from './blocks';
 
 export interface RichTextOptions {
-  annotations?: Partial<Annotations>;
+  annotations?: {
+    bold?: boolean;
+    italic?: boolean;
+    strikethrough?: boolean;
+    underline?: boolean;
+    code?: boolean;
+    color?: string;
+  };
   url?: string;
 }
 
@@ -10,7 +17,6 @@ export function richText(
   options: RichTextOptions = {}
 ): RichText {
   const annotations = options.annotations ?? {};
-
   return {
     type: 'text',
     annotations: {

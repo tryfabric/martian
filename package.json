@@ -21,16 +21,19 @@
     "parser",
     "gfm"
   ],
+  "engines": {
+    "node": ">=15"
+  },
   "author": "Richard Robinson",
   "license": "ISC",
   "dependencies": {
-    "@notionhq/client": "^0.1.9",
+    "@notionhq/client": "^0.4.5",
     "remark-gfm": "^1.0.0",
     "remark-parse": "^9.0.0",
     "unified": "^9.2.1"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.23",
+    "@types/jest": "^27",
     "@types/node": "^15.12.4",
     "gts": "^3.1.0",
     "jest": "^27.0.4",

@@ -114,11 +114,7 @@ describe('gfm parser', () => {
 
     const expected = [
       notion.paragraph([notion.richText('hello')]),
-      notion.paragraph([
-        notion.richText('public class Foo {}', {
-          annotations: {code: true},
-        }),
-      ]),
+      notion.code([notion.richText('public class Foo {}')]),
     ];
 
     expect(actual).toStrictEqual(expected);
@@ -127,15 +123,15 @@ describe('gfm parser', () => {
   it('should parse block quote', () => {
     const ast = md.root(
       md.blockquote(
-        md.heading(1, md.text('hello '), md.emphasis(md.text('world')))
+        md.heading(1, md.text('hello'), md.emphasis(md.text('world')))
       )
     );
 
     const actual = parseBlocks(ast);
 
     const expected = [
-      notion.headingOne([
-        notion.richText('hello '),
+      notion.blockquote([
+        notion.richText('hello'),
         notion.richText('world', {
           annotations: {italic: true},
         }),
