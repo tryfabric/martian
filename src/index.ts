@@ -5,6 +5,11 @@ import {parseBlocks, parseRichText} from './parser/internal';
 import type * as md from './markdown';
 import gfm from 'remark-gfm';
 
+export interface ParserOptions {
+  allowUnsupportedObjectType?: boolean;
+  strictImageUrls?: boolean;
+}
+
 /**
  * Parses Markdown content into Notion Blocks.
  * - Supports all heading types (heading depths 4, 5, 6 are treated as 3 for Notion)
@@ -24,10 +29,15 @@ import gfm from 'remark-gfm';
  */
 export function markdownToBlocks(
   body: string,
-  allowUnsupportedObjectType = false
+  options?: ParserOptions
 ): notion.Block[] {
+  const defaultedOptions = {
+    allowUnsupportedObjectType: false,
+    strictImageUrls: true,
+    ...options,
+  };
   const root = unified().use(markdown).use(gfm).parse(body);
-  return parseBlocks(root as unknown as md.Root, allowUnsupportedObjectType);
+  return parseBlocks(root as unknown as md.Root, defaultedOptions);
 }
 
 /**

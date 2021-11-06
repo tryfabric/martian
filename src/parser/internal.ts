@@ -1,5 +1,6 @@
 import * as md from '../markdown';
 import * as notion from '../notion';
+import {ParserOptions} from '..';
 import path from 'path';
 import {URL} from 'url';
 
@@ -48,7 +49,7 @@ function parseInline(
   }
 }
 
-function parseImage(image: md.Image): notion.Block {
+function parseImage(image: md.Image, options: ParserOptions): notion.Block {
   // https://developers.notion.com/reference/block#image-blocks
   const allowedTypes = [
     '.png',
@@ -62,24 +63,31 @@ function parseImage(image: md.Image): notion.Block {
     '.heic',
   ];
 
-  function dealWithError() {    
+  function dealWithError() {
     return notion.paragraph([notion.richText(image.url)]);
   }
 
   try {
-    const parsedUrl = new URL(image.url);
-    const fileType = path.extname(parsedUrl.pathname);
-    if (allowedTypes.includes(fileType)) {
-      return notion.image(image.url);
+    if (options.strictImageUrls) {
+      const parsedUrl = new URL(image.url);
+      const fileType = path.extname(parsedUrl.pathname);
+      if (allowedTypes.includes(fileType)) {
+        return notion.image(image.url);
+      } else {
+        return dealWithError();
+      }
     } else {
-      return dealWithError();
+      return notion.image(image.url);
     }
   } catch (error: unknown) {
     return dealWithError();
   }
 }
 
-function parseParagraph(element: md.Paragraph): notion.Block[] {
+function parseParagraph(
+  element: md.Paragraph,
+  options: ParserOptions
+): notion.Block[] {
   // Paragraphs can also be legacy 'TOC' from some markdown, so we check first
   const mightBeToc =
     element.children.length > 2 &&
@@ -100,7 +108,7 @@ function parseParagraph(element: md.Paragraph): notion.Block[] {
   const paragraphs: Array<notion.RichText[]> = [];
   element.children.forEach(item => {
     if (item.type === 'image') {
-      images.push(parseImage(item));
+      images.push(parseImage(item, options));
     } else {
       const richText = parseInline(item) as notion.RichText[];
       if (richText.length) {
@@ -116,10 +124,13 @@ function parseParagraph(element: md.Paragraph): notion.Block[] {
   }
 }
 
-function parseBlockquote(element: md.Blockquote): notion.Block {
+function parseBlockquote(
+  element: md.Blockquote,
+  options: ParserOptions
+): notion.Block {
   // Quotes can only contain RichText[], but come through as Block[]
   // This code collects and flattens the common ones
-  const blocks = element.children.flatMap(child => parseNode(child));
+  const blocks = element.children.flatMap(child => parseNode(child, options));
   const paragraphs = blocks.flatMap(child => child as notion.Block);
   const richtext = paragraphs.flatMap(child => {
     if (child.paragraph) {
@@ -159,7 +170,7 @@ function parseCode(element: md.Code): notion.Block {
   return notion.code(text);
 }
 
-function parseList(element: md.List): notion.Block[] {
+function parseList(element: md.List, options: ParserOptions): notion.Block[] {
   return element.children.flatMap(item => {
     const paragraph = item.children.shift();
     if (paragraph === undefined || paragraph.type !== 'paragraph') {
@@ -170,7 +181,7 @@ function parseList(element: md.List): notion.Block[] {
 
     // Now process any of the children
     const parsedChildren: notion.Block[] = item.children.flatMap(child =>
-      parseNode(child)
+      parseNode(child, options)
     );
 
     if (element.start !== null && element.start !== undefined) {
@@ -198,25 +209,28 @@ function parseTable(node: md.Table): notion.Block[] {
   return [notion.table(tableRows)];
 }
 
-function parseNode(node: md.FlowContent, unsupported = false): notion.Block[] {
+function parseNode(
+  node: md.FlowContent,
+  options: ParserOptions
+): notion.Block[] {
   switch (node.type) {
     case 'heading':
       return [parseHeading(node)];
 
     case 'paragraph':
-      return parseParagraph(node);
+      return parseParagraph(node, options);
 
     case 'code':
       return [parseCode(node)];
 
     case 'blockquote':
-      return [parseBlockquote(node)];
+      return [parseBlockquote(node, options)];
 
     case 'list':
-      return parseList(node);
+      return parseList(node, options);
 
     case 'table':
-      if (unsupported) {
+      if (options.allowUnsupportedObjectType) {
         return parseTable(node);
       } else {
         return [];
@@ -229,9 +243,9 @@ function parseNode(node: md.FlowContent, unsupported = false): notion.Block[] {
 
 export function parseBlocks(
   root: md.Root,
-  unsupported = false
+  options: ParserOptions
 ): notion.Block[] {
-  return root.children.flatMap(item => parseNode(item, unsupported));
+  return root.children.flatMap(item => parseNode(item, options));
 }
 
 export function parseRichText(root: md.Root): notion.RichText[] {

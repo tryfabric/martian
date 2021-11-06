@@ -22,14 +22,129 @@ Designed to make using the Notion SDK and API easier.  Notion API version 0.4.5.
   - Inline images are extracted from the paragraph and added afterwards (as these are not supported in notion)
   - Image urls are validated, if they are not valid as per the Notion external spec, they will be inserted as text for you to fix manually 
 
-## Unsupported Markdown Elements
+## Usage
+
+```ts
+import {markdownToBlocks, markdownToRichText} from '@instantish/martian';
+import type {RichText, Block} from '@notionhq/client/build/src/api-types';
+
+const richText: RichText[] = markdownToRichText(`**Hello _world_**`);
+
+// [
+//   {
+//     "type": "text",
+//     "annotations": {
+//       "bold": true,
+//     },
+//     "text": {
+//       "content": "Hello "
+//     }
+//   },
+//   {
+//     "type": "text",
+//     "annotations": {
+//       "bold": true,
+//       "italic": true,
+//     },
+//     "text": {
+//       "content": "world"
+//     }
+//   }
+// ]
+
+const options = { allowUnsupportedObjectType: false, strictImageUrls: true };
+const blocks: Block[] = markdownToBlocks(`
+## this is a _heading 2_
+
+* [x] todo list item
+`, options);
+
+// [
+//   {
+//     "object": "block",
+//     "type": "heading_2",
+//     "heading_2": {
+//       "text": [
+//         ...
+//         {
+//           "type": "text",
+//           "annotations": {
+//             "italic": true
+//           }
+//           "text": {
+//             "content": "heading 2"
+//           }
+//         },
+//       ]
+//     }
+//   },
+//   {
+//     "object": "block",
+//     "type": "to_do",
+//     "to_do": {
+//       "text": [
+//         {
+//           "type": "text",
+//           "annotations": {
+//           },
+//           "text": {
+//             "content": "todo list item"
+//           }
+//         }
+//       ],
+//       "checked": true
+//     }
+//   }
+// ]
+```
+
+### Images - Strict Mode
+
+By default, Notion will reject the entire document if you add a block that has an image with an invalid URL (this is not that nice), so by default this will parse in 'Strict Mode' where the image url is parsed, and if not valid, the image is actually parsed as text and added to the document.
+
+In some instances, for example, you are parsing markdown where the image references are local file paths, you may want to allow them to flow through, so that in your client code you can upload the images somewhere and then update the URL paths to point to them before loading into Notion.
+
+Default (strict mode enabled):
+
+```ts
+const options = { strictImageUrls: true };
+const blocks: Block[] = markdownToBlocks(`
+![image-invalid](https://image.com/blah)
+`)
+//  {
+//     "type": "text",
+//     "annotations": {
+//       ...
+//     },
+//     "text": {
+//       "content": "https://image.com/blah"
+//     }
+//   }
+```
+
+Strict mode disabled: 
+
+```ts
+const options = { strictImageUrls: false };
+const blocks: Block[] = markdownToBlocks(`
+![image-invalid](https://image.com/blah)
+`)
+//  {
+//     "type": "image",
+//     "image": {
+//       "url": "https://image.com/blah"
+//     }
+//   }
+```
+
+### Unsupported Markdown Elements
 
 *tables*: Tables can be imported in an [unsupported mode](https://developers.notion.com/reference/block) if you add a flag to the parser.
 
 First, the default mode - it ignores the tables:
 
 ```ts
-const allowUnsupportedObjectType = false;
+const options = { allowUnsupportedObjectType: false };
 const blocks: Block[] = markdownToBlocks(`
 # Table
 
@@ -37,7 +152,7 @@ const blocks: Block[] = markdownToBlocks(`
 | ------------- | ------------- |
 | Content Cell  | Content Cell  |
 | Content Cell  | Content Cell  |
-`, allowUnsupportedObjectType);
+`, options);
 
 // [
 //   {
@@ -69,7 +184,7 @@ Next, with unsupported flag = true (note the `annotations` have been removed fro
 
 
 ```ts
-const allowUnsupportedObjectType = true;
+const options = { allowUnsupportedObjectType: true };
 const blocks: Block[] = markdownToBlocks(`
 # Table
 
@@ -77,7 +192,7 @@ const blocks: Block[] = markdownToBlocks(`
 | ------------- | ------------- |
 | Content Cell  | Content Cell  |
 | Content Cell  | Content Cell  |
-`, allowUnsupportedObjectType)
+`, options)
 
  [
 //   {
@@ -214,83 +329,6 @@ const blocks: Block[] = markdownToBlocks(`
 ```
 
 Note that if you send this document to Notion with the current version of the API it *will* fail, but this allows you to pre-parse the blocks in your client library, and do something with the tables.  In one example, the tables are being parsed out of the blocks, databases being created, that are then linked back to the imported page:  https://github.com/infinitaslearning/notionater/blob/main/index.js#L81-L203
-
-
-## Usage
-
-```ts
-import {markdownToBlocks, markdownToRichText} from '@instantish/martian';
-import type {RichText, Block} from '@notionhq/client/build/src/api-types';
-
-const richText: RichText[] = markdownToRichText(`**Hello _world_**`);
-
-// [
-//   {
-//     "type": "text",
-//     "annotations": {
-//       "bold": true,
-//     },
-//     "text": {
-//       "content": "Hello "
-//     }
-//   },
-//   {
-//     "type": "text",
-//     "annotations": {
-//       "bold": true,
-//       "italic": true,
-//     },
-//     "text": {
-//       "content": "world"
-//     }
-//   }
-// ]
-
-
-const blocks: Block[] = markdownToBlocks(`
-## this is a _heading 2_
-
-* [x] todo list item
-`)
-
-// [
-//   {
-//     "object": "block",
-//     "type": "heading_2",
-//     "heading_2": {
-//       "text": [
-//         ...
-//         {
-//           "type": "text",
-//           "annotations": {
-//             "italic": true
-//           }
-//           "text": {
-//             "content": "heading 2"
-//           }
-//         },
-//       ]
-//     }
-//   },
-//   {
-//     "object": "block",
-//     "type": "to_do",
-//     "to_do": {
-//       "text": [
-//         {
-//           "type": "text",
-//           "annotations": {
-//           },
-//           "text": {
-//             "content": "todo list item"
-//           }
-//         }
-//       ],
-//       "checked": true
-//     }
-//   }
-// ]
-```
 
 ---
 

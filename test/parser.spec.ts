@@ -4,6 +4,7 @@ import * as notion from '../src/notion';
 import {parseBlocks, parseRichText} from '../src/parser/internal';
 
 describe('gfm parser', () => {
+  const options = {allowUnsupportedObjectType: false, strictImageUrls: true};
   it('should parse paragraph with nested annotations', () => {
     const ast = md.root(
       md.paragraph(
@@ -14,7 +15,7 @@ describe('gfm parser', () => {
       )
     );
 
-    const actual = parseBlocks(ast);
+    const actual = parseBlocks(ast, options);
 
     const expected = [
       notion.paragraph([
@@ -48,7 +49,7 @@ describe('gfm parser', () => {
       )
     );
 
-    const actual = parseBlocks(ast);
+    const actual = parseBlocks(ast, options);
 
     const expected = [
       notion.paragraph([
@@ -74,7 +75,7 @@ describe('gfm parser', () => {
       md.paragraph(md.text('world'))
     );
 
-    const actual = parseBlocks(ast);
+    const actual = parseBlocks(ast, options);
 
     const expected = [
       notion.paragraph([notion.richText('hello')]),
@@ -92,7 +93,7 @@ describe('gfm parser', () => {
       md.heading(4, md.text('heading4'))
     );
 
-    const actual = parseBlocks(ast);
+    const actual = parseBlocks(ast, options);
 
     const expected = [
       notion.headingOne([notion.richText('heading1')]),
@@ -110,7 +111,7 @@ describe('gfm parser', () => {
       md.code('public class Foo {}', 'java')
     );
 
-    const actual = parseBlocks(ast);
+    const actual = parseBlocks(ast, options);
 
     const expected = [
       notion.paragraph([notion.richText('hello')]),
@@ -127,7 +128,7 @@ describe('gfm parser', () => {
       )
     );
 
-    const actual = parseBlocks(ast);
+    const actual = parseBlocks(ast, options);
 
     const expected = [
       notion.blockquote([
@@ -152,7 +153,7 @@ describe('gfm parser', () => {
       md.orderedList(md.listItem(md.paragraph(md.text('d'))))
     );
 
-    const actual = parseBlocks(ast);
+    const actual = parseBlocks(ast, options);
 
     const expected = [
       notion.paragraph([notion.richText('hello')]),
@@ -189,7 +190,7 @@ describe('gfm parser', () => {
       )
     );
 
-    const actual = parseBlocks(ast);
+    const actual = parseBlocks(ast, options);
 
     const expected = [
       notion.paragraph([
