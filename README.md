@@ -18,7 +18,9 @@ Designed to make using the Notion SDK and API easier.  Notion API version 0.4.5.
 * All headers (header levels >= 3 are treated as header level 3)
 * Code blocks
 * Block quotes
-* Images (where the image is the first element in the paragraph and it has a valid full URL)
+* Images
+  - Inline images are extracted from the paragraph and added afterwards (as these are not supported in notion)
+  - Image urls are validated, if they are not valid as per the Notion external spec, they will be inserted as text for you to fix manually 
 
 ## Unsupported Markdown Elements
 
