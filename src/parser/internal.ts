@@ -62,10 +62,7 @@ function parseImage(image: md.Image): notion.Block {
     '.heic',
   ];
 
-  function dealWithError() {
-    console.log(
-      `${image.url} is not a valid Notion image url, I will process this as text for you to fix later`
-    );
+  function dealWithError() {    
     return notion.paragraph([notion.richText(image.url)]);
   }
 
