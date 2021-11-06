@@ -1,5 +1,6 @@
 import * as md from '../markdown';
 import * as notion from '../notion';
+import path from 'path';
 import {URL} from 'url';
 
 function ensureLength(text: string, copy?: object) {
@@ -47,23 +48,42 @@ function parseInline(
   }
 }
 
-function parseParagraph(element: md.Paragraph): notion.Block {
-  // If a paragraph containts an image element as its first element
-  // Lets assume it is an image, and parse it as only that (discard remaining content)
-  const isImage = element.children[0].type === 'image';
-  if (isImage) {
-    const image = element.children[0] as md.Image;
-    try {
-      new URL(image.url);
-      return notion.image(image.url);
-    } catch (error: any) {
-      console.log(
-        `${error.input} is not a valid url, I will process this as text for you to fix later`
-      );
-    }
+function parseImage(image: md.Image): notion.Block {
+  // https://developers.notion.com/reference/block#image-blocks
+  const allowedTypes = [
+    '.png',
+    '.jpg',
+    '.jpeg',
+    '.gif',
+    '.tif',
+    '.tiff',
+    '.bmp',
+    '.svg',
+    '.heic',
+  ];
+
+  function dealWithError() {
+    console.log(
+      `${image.url} is not a valid Notion image url, I will process this as text for you to fix later`
+    );
+    return notion.paragraph([notion.richText(image.url)]);
   }
 
-  // Paragraphs can also be legacy 'TOC' from some markdown
+  try {
+    const parsedUrl = new URL(image.url);
+    const fileType = path.extname(parsedUrl.pathname);
+    if (allowedTypes.includes(fileType)) {
+      return notion.image(image.url);
+    } else {
+      return dealWithError();
+    }
+  } catch (error: unknown) {
+    return dealWithError();
+  }
+}
+
+function parseParagraph(element: md.Paragraph): notion.Block[] {
+  // Paragraphs can also be legacy 'TOC' from some markdown, so we check first
   const mightBeToc =
     element.children.length > 2 &&
     element.children[0].type === 'text' &&
@@ -73,12 +93,30 @@ function parseParagraph(element: md.Paragraph): notion.Block {
     const emphasisItem = element.children[1] as md.Emphasis;
     const emphasisTextItem = emphasisItem.children[0] as md.Text;
     if (emphasisTextItem.value === 'TOC') {
-      return notion.table_of_contents();
+      return [notion.table_of_contents()];
     }
   }
 
-  const text = element.children.flatMap(child => parseInline(child));
-  return notion.paragraph(text);
+  // Notion doesn't deal with inline images, so we need to parse them all out
+  // of the paragraph into individual blocks
+  const images: notion.Block[] = [];
+  const paragraphs: Array<notion.RichText[]> = [];
+  element.children.forEach(item => {
+    if (item.type === 'image') {
+      images.push(parseImage(item));
+    } else {
+      const richText = parseInline(item) as notion.RichText[];
+      if (richText.length) {
+        paragraphs.push(richText);
+      }
+    }
+  });
+
+  if (paragraphs.length) {
+    return [notion.paragraph(paragraphs.flat()), ...images];
+  } else {
+    return images;
+  }
 }
 
 function parseBlockquote(element: md.Blockquote): notion.Block {
@@ -169,7 +207,7 @@ function parseNode(node: md.FlowContent, unsupported = false): notion.Block[] {
       return [parseHeading(node)];
 
     case 'paragraph':
-      return [parseParagraph(node)];
+      return parseParagraph(node);
 
     case 'code':
       return [parseCode(node)];
