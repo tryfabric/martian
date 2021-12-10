@@ -1,6 +1,8 @@
 # Martian: Markdown to Notion Parser
 
-> Convert Markdown and GitHub Flavoured Markdown to Notion API Blocks and RichText
+> NOTE: Please use the new NPM package at [@tryfabric/martian](https://www.npmjs.com/package/@tryfabric/martian).
+
+Convert Markdown and GitHub Flavoured Markdown to Notion API Blocks and RichText.
 
 [![Node.js CI](https://github.com/instantish/martian/actions/workflows/ci.yml/badge.svg)](https://github.com/instantish/martian/actions/workflows/ci.yml)
 [![Code Style: Google](https://img.shields.io/badge/code%20style-google-blueviolet.svg)](https://github.com/google/gts)
