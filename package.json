@@ -1,6 +1,6 @@
 {
   "name": "@tryfabric/martian",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Converts Markdown to Notion Blocks and RichText",
   "repository": "https://github.com/instantish/martian",
   "main": "build/src/index.js",
