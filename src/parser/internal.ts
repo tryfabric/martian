@@ -200,10 +200,17 @@ export function parseBlocks(
 }
 
 export function parseRichText(root: md.Root): notion.RichText[] {
-  if (root.children.length !== 1 || root.children[0].type !== 'paragraph') {
+  if (root.children[0].type !== 'paragraph') {
     throw new Error(`Unsupported markdown element: ${JSON.stringify(root)}`);
   }
 
-  const paragraph = root.children[0];
-  return paragraph.children.flatMap(child => parseInline(child));
+  const richTexts: notion.RichText[] = [];
+  root.children.forEach(paragraph => {
+    if (paragraph.type === 'paragraph') {
+      paragraph.children.forEach(child =>
+        richTexts.push(...parseInline(child))
+      );
+    }
+  });
+  return richTexts;
 }

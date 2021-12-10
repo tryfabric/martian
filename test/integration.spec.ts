@@ -128,4 +128,18 @@ const hello = "hello";
 
     expect(expected).toStrictEqual(actual);
   });
+
+  it('should convert markdown with multiple newlines to rich text', () => {
+    const text = 'hello\n\n[url](http://google.com)';
+    const actual = markdownToRichText(text);
+
+    const expected = [
+      notion.richText('hello'),
+      notion.richText('url', {
+        url: 'http://google.com',
+      }),
+    ];
+
+    expect(expected).toStrictEqual(actual);
+  });
 });
