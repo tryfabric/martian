@@ -200,7 +200,7 @@ export interface CommonOptions {
    * Define how to behave when an item exceeds the Notion's request limits.
    * @see https://developers.notion.com/reference/request-limits#limits-for-property-values
    */
-  notionLimits: {
+  notionLimits?: {
     /**
      * Whether the excess items or characters should be automatically truncated where possible.
      * If set to `false`, the resulting item will not be compliant with Notion's limits.
@@ -218,16 +218,16 @@ export interface BlocksOptions extends CommonOptions {
 
 export function parseBlocks(
   root: md.Root,
-  options: BlocksOptions
+  options?: BlocksOptions
 ): notion.Block[] {
   return root.children.flatMap(item =>
-    parseNode(item, options.allowUnsupportedObjectType === true)
+    parseNode(item, options?.allowUnsupportedObjectType === true)
   );
 }
 
 export function parseRichText(
   root: md.Root,
-  options: CommonOptions
+  options?: CommonOptions
 ): notion.RichText[] {
   if (root.children[0].type !== 'paragraph') {
     throw new Error(`Unsupported markdown element: ${JSON.stringify(root)}`);
