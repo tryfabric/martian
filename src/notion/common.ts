@@ -1,5 +1,18 @@
 import type {RichText} from './blocks';
 
+/**
+ * The limits that the Notion API uses for property values.
+ * @see https://developers.notion.com/reference/request-limits#limits-for-property-values
+ */
+export const LIMITS = {
+  RICH_TEXT_ARRAYS: 100,
+  RICH_TEXT: {
+    TEXT_CONTENT: 2000,
+    LINK_URL: 1000,
+    EQUATION_EXPRESSION: 1000,
+  },
+};
+
 export interface RichTextOptions {
   annotations?: {
     bold?: boolean;
