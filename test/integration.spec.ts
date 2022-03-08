@@ -61,8 +61,8 @@ const hello = "hello";
     const text = fs.readFileSync('test/fixtures/large-item.md').toString();
     const actual = markdownToBlocks(text);
 
-    const paragraph = actual[1].paragraph as notion.RichText;
-    const textArray = paragraph.text as Array<object>;
+    const paragraph = actual[1].paragraph as unknown as notion.RichText;
+    const textArray = paragraph.text as unknown as Array<object>;
 
     expect(textArray.length).toStrictEqual(9);
   });
@@ -85,14 +85,14 @@ const hello = "hello";
 
   it('should convert markdown to blocks - skip tables if unsupported = false', () => {
     const text = fs.readFileSync('test/fixtures/table.md').toString();
-    const actual = markdownToBlocks(text, false);
+    const actual = markdownToBlocks(text, {allowUnsupportedObjectType: false});
     const expected = [notion.headingOne([notion.richText('Table')])];
     expect(expected).toStrictEqual(actual);
   });
 
   it('should convert markdown to blocks - include tables if unsupported = true', () => {
     const text = fs.readFileSync('test/fixtures/table.md').toString();
-    const actual = markdownToBlocks(text, true);
+    const actual = markdownToBlocks(text, {allowUnsupportedObjectType: true});
     const expected = [
       notion.headingOne([notion.richText('Table')]),
       notion.table([
