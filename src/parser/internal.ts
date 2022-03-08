@@ -204,6 +204,8 @@ export interface CommonOptions {
     /**
      * Whether the excess items or characters should be automatically truncated where possible.
      * If set to `false`, the resulting item will not be compliant with Notion's limits.
+     * Please note that text will be truncated only if the parser is not able to resolve
+     * the issue in any other way.
      */
     truncate?: boolean;
     /** The callback for when an item exceeds Notion's limits. */
