@@ -222,9 +222,21 @@ export function parseBlocks(
   root: md.Root,
   options?: BlocksOptions
 ): notion.Block[] {
-  return root.children.flatMap(item =>
+  const parsed = root.children.flatMap(item =>
     parseNode(item, options?.allowUnsupportedObjectType === true)
   );
+
+  const truncate = !!(options?.notionLimits?.truncate ?? true),
+    limitCallback = options?.notionLimits?.onError ?? (() => {});
+
+  if (parsed.length > LIMITS.PAYLOAD_BLOCKS)
+    limitCallback(
+      new Error(
+        `Resulting blocks array exceeds Notion limit (${LIMITS.PAYLOAD_BLOCKS})`
+      )
+    );
+
+  return truncate ? parsed.slice(0, LIMITS.PAYLOAD_BLOCKS) : parsed;
 }
 
 export function parseRichText(

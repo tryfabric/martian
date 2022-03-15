@@ -5,6 +5,7 @@ import type {RichText} from './blocks';
  * @see https://developers.notion.com/reference/request-limits#limits-for-property-values
  */
 export const LIMITS = {
+  PAYLOAD_BLOCKS: 1000,
   RICH_TEXT_ARRAYS: 100,
   RICH_TEXT: {
     TEXT_CONTENT: 2000,
