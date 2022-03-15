@@ -88,7 +88,7 @@ const hello = "hello";
     it('should skip tables if unsupported = false', () => {
       const text = fs.readFileSync('test/fixtures/table.md').toString();
       const actual = markdownToBlocks(text, {
-        allowUnsupportedObjectType: false,
+        allowUnsupported: false,
       });
       const expected = [notion.headingOne([notion.richText('Table')])];
       expect(expected).toStrictEqual(actual);
@@ -96,7 +96,7 @@ const hello = "hello";
 
     it('should include tables if unsupported = true', () => {
       const text = fs.readFileSync('test/fixtures/table.md').toString();
-      const actual = markdownToBlocks(text, {allowUnsupportedObjectType: true});
+      const actual = markdownToBlocks(text, {allowUnsupported: true});
       const expected = [
         notion.headingOne([notion.richText('Table')]),
         notion.table([

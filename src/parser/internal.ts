@@ -215,7 +215,7 @@ export interface CommonOptions {
 
 export interface BlocksOptions extends CommonOptions {
   /** Whether to allow unsupported object types. */
-  allowUnsupportedObjectType?: boolean;
+  allowUnsupported?: boolean;
 }
 
 export function parseBlocks(
@@ -223,7 +223,7 @@ export function parseBlocks(
   options?: BlocksOptions
 ): notion.Block[] {
   const parsed = root.children.flatMap(item =>
-    parseNode(item, options?.allowUnsupportedObjectType === true)
+    parseNode(item, options?.allowUnsupported === true)
   );
 
   const truncate = !!(options?.notionLimits?.truncate ?? true),
