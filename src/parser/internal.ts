@@ -1,6 +1,7 @@
 import * as md from '../markdown';
 import * as notion from '../notion';
 import {URL} from 'url';
+import {LIMITS} from '../notion';
 
 function ensureLength(text: string, copy?: object) {
   const chunks = text.match(/[^]{1,2000}/g) || [];
@@ -56,6 +57,7 @@ function parseParagraph(element: md.Paragraph): notion.Block {
     try {
       new URL(image.url);
       return notion.image(image.url);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log(
         `${error.input} is not a valid url, I will process this as text for you to fix later`
@@ -192,14 +194,55 @@ function parseNode(node: md.FlowContent, unsupported = false): notion.Block[] {
   }
 }
 
-export function parseBlocks(
-  root: md.Root,
-  unsupported = false
-): notion.Block[] {
-  return root.children.flatMap(item => parseNode(item, unsupported));
+/** Options common to all methods. */
+export interface CommonOptions {
+  /**
+   * Define how to behave when an item exceeds the Notion's request limits.
+   * @see https://developers.notion.com/reference/request-limits#limits-for-property-values
+   */
+  notionLimits?: {
+    /**
+     * Whether the excess items or characters should be automatically truncated where possible.
+     * If set to `false`, the resulting item will not be compliant with Notion's limits.
+     * Please note that text will be truncated only if the parser is not able to resolve
+     * the issue in any other way.
+     */
+    truncate?: boolean;
+    /** The callback for when an item exceeds Notion's limits. */
+    onError?: (err: Error) => void;
+  };
 }
 
-export function parseRichText(root: md.Root): notion.RichText[] {
+export interface BlocksOptions extends CommonOptions {
+  /** Whether to allow unsupported object types. */
+  allowUnsupported?: boolean;
+}
+
+export function parseBlocks(
+  root: md.Root,
+  options?: BlocksOptions
+): notion.Block[] {
+  const parsed = root.children.flatMap(item =>
+    parseNode(item, options?.allowUnsupported === true)
+  );
+
+  const truncate = !!(options?.notionLimits?.truncate ?? true),
+    limitCallback = options?.notionLimits?.onError ?? (() => {});
+
+  if (parsed.length > LIMITS.PAYLOAD_BLOCKS)
+    limitCallback(
+      new Error(
+        `Resulting blocks array exceeds Notion limit (${LIMITS.PAYLOAD_BLOCKS})`
+      )
+    );
+
+  return truncate ? parsed.slice(0, LIMITS.PAYLOAD_BLOCKS) : parsed;
+}
+
+export function parseRichText(
+  root: md.Root,
+  options?: CommonOptions
+): notion.RichText[] {
   if (root.children[0].type !== 'paragraph') {
     throw new Error(`Unsupported markdown element: ${JSON.stringify(root)}`);
   }
@@ -212,5 +255,44 @@ export function parseRichText(root: md.Root): notion.RichText[] {
       );
     }
   });
-  return richTexts;
+
+  const truncate = !!(options?.notionLimits?.truncate ?? true),
+    limitCallback = options?.notionLimits?.onError ?? (() => {});
+
+  if (richTexts.length > LIMITS.RICH_TEXT_ARRAYS)
+    limitCallback(
+      new Error(
+        `Resulting richTexts array exceeds Notion limit (${LIMITS.RICH_TEXT_ARRAYS})`
+      )
+    );
+
+  return (
+    truncate ? richTexts.slice(0, LIMITS.RICH_TEXT_ARRAYS) : richTexts
+  ).map(rt => {
+    if (rt.text.content.length > LIMITS.RICH_TEXT.TEXT_CONTENT) {
+      limitCallback(
+        new Error(
+          `Resulting text content exceeds Notion limit (${LIMITS.RICH_TEXT.TEXT_CONTENT})`
+        )
+      );
+      if (truncate)
+        rt.text.content =
+          rt.text.content.slice(0, LIMITS.RICH_TEXT.TEXT_CONTENT - 3) + '...';
+    }
+
+    if (
+      rt.text.link?.url &&
+      rt.text.link.url.length > LIMITS.RICH_TEXT.LINK_URL
+    )
+      // There's no point in truncating URLs
+      limitCallback(
+        new Error(
+          `Resulting text URL exceeds Notion limit (${LIMITS.RICH_TEXT.LINK_URL})`
+        )
+      );
+
+    // Notion equations are not supported by this library, since they don't exist in Markdown
+
+    return rt;
+  });
 }

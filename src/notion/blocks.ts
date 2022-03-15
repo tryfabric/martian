@@ -21,7 +21,13 @@ export interface BlockText {
 export interface RichText {
   type: string;
   annotations: object;
-  text: object;
+  text: {
+    content: string;
+    link?: {
+      type: 'url';
+      url: string;
+    };
+  };
 }
 
 export function paragraph(text: RichText[]): Block {
