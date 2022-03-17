@@ -44,7 +44,7 @@ const blocks: Block[] = markdownToBlocks(`
 //     "object": "block",
 //     "type": "heading_1",
 //     "heading_1": {
-//       "text": [
+//       "rich_text": [
 //         {
 //           "type": "text",
 //           "annotations": {
