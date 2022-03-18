@@ -101,18 +101,18 @@ const hello = "hello";
         notion.headingOne([notion.richText('Table')]),
         notion.table([
           notion.tableRow([
-            notion.tableCell([notion.richText('First Header')]),
-            notion.tableCell([notion.richText('Second Header')]),
+            [ notion.richText('First Header') ],
+            [ notion.richText('Second Header') ],
           ]),
           notion.tableRow([
-            notion.tableCell([notion.richText('Content Cell')]),
-            notion.tableCell([notion.richText('Content Cell')]),
+            [ notion.richText('Content Cell') ],
+            [ notion.richText('Content Cell') ],
           ]),
           notion.tableRow([
-            notion.tableCell([notion.richText('Content Cell')]),
-            notion.tableCell([notion.richText('Content Cell')]),
+            [ notion.richText('Content Cell') ],
+            [ notion.richText('Content Cell') ],
           ]),
-        ]),
+        ], 2),
       ];
 
       expect(expected).toStrictEqual(actual);

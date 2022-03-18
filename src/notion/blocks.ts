@@ -156,32 +156,23 @@ export function toDo(
   } as Block;
 }
 
-export function table(children: Block[] = []): Block {
+export function table(children: Block[] = [], tableWidth: number): Block {
   return {
-    object: 'unsupported',
+    object: 'block',
     type: 'table',
     table: {
+      table_width: tableWidth,
       children: children.length ? children : undefined,
     },
   } as Block;
 }
 
-export function tableRow(children: Block[] = []): Block {
+export function tableRow(cells: Block[][] = []): Block {
   return {
-    object: 'unsupported',
+    object: 'block',
     type: 'table_row',
     table_row: {
-      children: children.length ? children : undefined,
-    },
-  } as Block;
-}
-
-export function tableCell(children: Block[] = []): Block {
-  return {
-    object: 'unsupported',
-    type: 'table_cell',
-    table_cell: {
-      children: children.length ? children : undefined,
+      cells: cells.length ? cells : undefined,
     },
   } as Block;
 }
