@@ -1,11 +1,19 @@
 import * as md from '../markdown';
 import * as notion from '../notion';
 import {URL} from 'url';
-import {LIMITS} from '../notion';
+import {LIMITS, SUPPORTED_CODE_BLOCK_LANGUAGES} from '../notion';
 
 function ensureLength(text: string, copy?: object) {
   const chunks = text.match(/[^]{1,2000}/g) || [];
   return chunks.flatMap((item: string) => notion.richText(item, copy));
+}
+
+function ensureCodeBlockLanguage(lang?: string): string | undefined {
+  if (lang && SUPPORTED_CODE_BLOCK_LANGUAGES.includes(lang)) {
+    return lang;
+  }
+
+  return undefined;
 }
 
 function parseInline(
@@ -123,7 +131,8 @@ function parseHeading(element: md.Heading): notion.Block {
 
 function parseCode(element: md.Code): notion.Block {
   const text = ensureLength(element.value);
-  return notion.code(text);
+  const lang = ensureCodeBlockLanguage(element.lang);
+  return notion.code(text, lang);
 }
 
 function parseList(element: md.List): notion.Block[] {

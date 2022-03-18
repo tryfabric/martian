@@ -104,7 +104,23 @@ describe('gfm parser', () => {
     expect(actual).toStrictEqual(expected);
   });
 
-  it('should parse code block', () => {
+  it('should parse code block and set the language to javascript \
+    if none is provided', () => {
+    const ast = md.root(
+      md.paragraph(md.text('hello')),
+      md.code('const foo = () => {}', undefined)
+    );
+
+    const actual = parseBlocks(ast);
+
+    const expected = [
+      notion.paragraph([notion.richText('hello')]),
+      notion.code([notion.richText('const foo = () => {}')], 'javascript'),
+    ];
+    expect(actual).toStrictEqual(expected);
+  });
+
+  it('should parse code block and set the proper language', () => {
     const ast = md.root(
       md.paragraph(md.text('hello')),
       md.code('public class Foo {}', 'java')
@@ -114,7 +130,24 @@ describe('gfm parser', () => {
 
     const expected = [
       notion.paragraph([notion.richText('hello')]),
-      notion.code([notion.richText('public class Foo {}')]),
+      notion.code([notion.richText('public class Foo {}')], 'java'),
+    ];
+
+    expect(actual).toStrictEqual(expected);
+  });
+
+  it('should parse code block and set the language to javascript \
+      if it is not supported by Notion', () => {
+    const ast = md.root(
+      md.paragraph(md.text('hello')),
+      md.code('const foo = () => {}', 'not-supported')
+    );
+
+    const actual = parseBlocks(ast);
+
+    const expected = [
+      notion.paragraph([notion.richText('hello')]),
+      notion.code([notion.richText('const foo = () => {}')], 'javascript'),
     ];
 
     expect(actual).toStrictEqual(expected);
