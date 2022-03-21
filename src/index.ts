@@ -1,14 +1,14 @@
 import unified from 'unified';
 import markdown from 'remark-parse';
 import type * as notion from './notion';
-import {parseBlocks, parseRichText} from './parser/internal';
+import {
+  BlocksOptions,
+  CommonOptions,
+  parseBlocks,
+  parseRichText,
+} from './parser/internal';
 import type * as md from './markdown';
 import gfm from 'remark-gfm';
-
-export interface ParserOptions {
-  allowUnsupportedObjectType?: boolean;
-  strictImageUrls?: boolean;
-}
 
 /**
  * Parses Markdown content into Notion Blocks.
@@ -25,19 +25,16 @@ export interface ParserOptions {
  *
  * Supports GitHub-flavoured Markdown.
  *
- * @param body any Markdown or GFM content
+ * @param body Any Markdown or GFM content
+ * @param options Any additional option
  */
 export function markdownToBlocks(
   body: string,
-  options?: ParserOptions
+
+  options?: BlocksOptions
 ): notion.Block[] {
-  const defaultedOptions = {
-    allowUnsupportedObjectType: false,
-    strictImageUrls: true,
-    ...options,
-  };
   const root = unified().use(markdown).use(gfm).parse(body);
-  return parseBlocks(root as unknown as md.Root, defaultedOptions);
+  return parseBlocks(root as unknown as md.Root, options);
 }
 
 /**
@@ -45,8 +42,12 @@ export function markdownToBlocks(
  * Only supports plain text, italics, bold, strikethrough, inline code, and hyperlinks.
  *
  * @param text any inline Markdown or GFM content
+ * @param options Any additional option
  */
-export function markdownToRichText(text: string): notion.RichText[] {
+export function markdownToRichText(
+  text: string,
+  options?: CommonOptions
+): notion.RichText[] {
   const root = unified().use(markdown).use(gfm).parse(text);
-  return parseRichText(root as unknown as md.Root);
+  return parseRichText(root as unknown as md.Root, options);
 }

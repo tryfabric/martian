@@ -1,8 +1,10 @@
 # Martian: Markdown to Notion Parser
 
-> Convert Markdown and GitHub Flavoured Markdown to Notion API Blocks and RichText
+> NOTE: Please use the new NPM package at [@tryfabric/martian](https://www.npmjs.com/package/@tryfabric/martian).
 
-[![Node.js CI](https://github.com/rr-codes/martian/actions/workflows/ci.yml/badge.svg)](https://github.com/rr-codes/martian/actions/workflows/ci.yml)
+Convert Markdown and GitHub Flavoured Markdown to Notion API Blocks and RichText.
+
+[![Node.js CI](https://github.com/instantish/martian/actions/workflows/ci.yml/badge.svg)](https://github.com/instantish/martian/actions/workflows/ci.yml)
 [![Code Style: Google](https://img.shields.io/badge/code%20style-google-blueviolet.svg)](https://github.com/google/gts)
 
 Martian is a Markdown parser to convert any Markdown content to Notion API block or RichText objects. It
@@ -333,3 +335,5 @@ Note that if you send this document to Notion with the current version of the AP
 ---
 
 Built with 💙 by the team behind [Fabric](https://tryfabric.com).
+
+<img src="https://static.scarf.sh/a.png?x-pxid=79ae4e0a-7e48-4965-8a83-808c009aa47a" />

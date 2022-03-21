@@ -1,8 +1,8 @@
 import * as md from '../markdown';
 import * as notion from '../notion';
-import {ParserOptions} from '..';
 import path from 'path';
 import {URL} from 'url';
+import {LIMITS} from '../notion';
 
 function ensureLength(text: string, copy?: object) {
   const chunks = text.match(/[^]{1,2000}/g) || [];
@@ -49,7 +49,7 @@ function parseInline(
   }
 }
 
-function parseImage(image: md.Image, options: ParserOptions): notion.Block {
+function parseImage(image: md.Image, options: BlocksOptions): notion.Block {
   // https://developers.notion.com/reference/block#image-blocks
   const allowedTypes = [
     '.png',
@@ -68,7 +68,7 @@ function parseImage(image: md.Image, options: ParserOptions): notion.Block {
   }
 
   try {
-    if (options.strictImageUrls) {
+    if (options.strictImageUrls ?? true) {
       const parsedUrl = new URL(image.url);
       const fileType = path.extname(parsedUrl.pathname);
       if (allowedTypes.includes(fileType)) {
@@ -86,7 +86,7 @@ function parseImage(image: md.Image, options: ParserOptions): notion.Block {
 
 function parseParagraph(
   element: md.Paragraph,
-  options: ParserOptions
+  options: BlocksOptions
 ): notion.Block[] {
   // Paragraphs can also be legacy 'TOC' from some markdown, so we check first
   const mightBeToc =
@@ -126,7 +126,7 @@ function parseParagraph(
 
 function parseBlockquote(
   element: md.Blockquote,
-  options: ParserOptions
+  options: BlocksOptions
 ): notion.Block {
   // Quotes can only contain RichText[], but come through as Block[]
   // This code collects and flattens the common ones
@@ -170,7 +170,7 @@ function parseCode(element: md.Code): notion.Block {
   return notion.code(text);
 }
 
-function parseList(element: md.List, options: ParserOptions): notion.Block[] {
+function parseList(element: md.List, options: BlocksOptions): notion.Block[] {
   return element.children.flatMap(item => {
     const paragraph = item.children.shift();
     if (paragraph === undefined || paragraph.type !== 'paragraph') {
@@ -211,7 +211,7 @@ function parseTable(node: md.Table): notion.Block[] {
 
 function parseNode(
   node: md.FlowContent,
-  options: ParserOptions
+  options: BlocksOptions
 ): notion.Block[] {
   switch (node.type) {
     case 'heading':
@@ -230,7 +230,7 @@ function parseNode(
       return parseList(node, options);
 
     case 'table':
-      if (options.allowUnsupportedObjectType) {
+      if (options.allowUnsupported) {
         return parseTable(node);
       } else {
         return [];
@@ -241,18 +241,106 @@ function parseNode(
   }
 }
 
-export function parseBlocks(
-  root: md.Root,
-  options: ParserOptions
-): notion.Block[] {
-  return root.children.flatMap(item => parseNode(item, options));
+/** Options common to all methods. */
+export interface CommonOptions {
+  /**
+   * Define how to behave when an item exceeds the Notion's request limits.
+   * @see https://developers.notion.com/reference/request-limits#limits-for-property-values
+   */
+  notionLimits?: {
+    /**
+     * Whether the excess items or characters should be automatically truncated where possible.
+     * If set to `false`, the resulting item will not be compliant with Notion's limits.
+     * Please note that text will be truncated only if the parser is not able to resolve
+     * the issue in any other way.
+     */
+    truncate?: boolean;
+    /** The callback for when an item exceeds Notion's limits. */
+    onError?: (err: Error) => void;
+  };
 }
 
-export function parseRichText(root: md.Root): notion.RichText[] {
-  if (root.children.length !== 1 || root.children[0].type !== 'paragraph') {
+export interface BlocksOptions extends CommonOptions {
+  /** Whether to allow unsupported object types. */
+  allowUnsupported?: boolean;
+
+  /** Whether to render invalid images as text */
+  strictImageUrls?: boolean;
+}
+
+export function parseBlocks(
+  root: md.Root,
+  options?: BlocksOptions
+): notion.Block[] {
+  const parsed = root.children.flatMap(item => parseNode(item, options || {}));
+
+  const truncate = !!(options?.notionLimits?.truncate ?? true),
+    limitCallback = options?.notionLimits?.onError ?? (() => {});
+
+  if (parsed.length > LIMITS.PAYLOAD_BLOCKS)
+    limitCallback(
+      new Error(
+        `Resulting blocks array exceeds Notion limit (${LIMITS.PAYLOAD_BLOCKS})`
+      )
+    );
+
+  return truncate ? parsed.slice(0, LIMITS.PAYLOAD_BLOCKS) : parsed;
+}
+
+export function parseRichText(
+  root: md.Root,
+  options?: CommonOptions
+): notion.RichText[] {
+  if (root.children[0].type !== 'paragraph') {
     throw new Error(`Unsupported markdown element: ${JSON.stringify(root)}`);
   }
 
-  const paragraph = root.children[0];
-  return paragraph.children.flatMap(child => parseInline(child));
+  const richTexts: notion.RichText[] = [];
+  root.children.forEach(paragraph => {
+    if (paragraph.type === 'paragraph') {
+      paragraph.children.forEach(child =>
+        richTexts.push(...parseInline(child))
+      );
+    }
+  });
+
+  const truncate = !!(options?.notionLimits?.truncate ?? true),
+    limitCallback = options?.notionLimits?.onError ?? (() => {});
+
+  if (richTexts.length > LIMITS.RICH_TEXT_ARRAYS)
+    limitCallback(
+      new Error(
+        `Resulting richTexts array exceeds Notion limit (${LIMITS.RICH_TEXT_ARRAYS})`
+      )
+    );
+
+  return (
+    truncate ? richTexts.slice(0, LIMITS.RICH_TEXT_ARRAYS) : richTexts
+  ).map(rt => {
+    if (rt.text.content.length > LIMITS.RICH_TEXT.TEXT_CONTENT) {
+      limitCallback(
+        new Error(
+          `Resulting text content exceeds Notion limit (${LIMITS.RICH_TEXT.TEXT_CONTENT})`
+        )
+      );
+      if (truncate)
+        rt.text.content =
+          rt.text.content.slice(0, LIMITS.RICH_TEXT.TEXT_CONTENT - 3) + '...';
+    }
+
+    if (
+      rt.text.link?.url &&
+      rt.text.link.url.length > LIMITS.RICH_TEXT.LINK_URL
+    )
+      // There's no point in truncating URLs
+      limitCallback(
+        new Error(
+          `Resulting text URL exceeds Notion limit (${LIMITS.RICH_TEXT.LINK_URL})`
+        )
+      );
+
+    // Notion equations are not supported by this library, since they don't exist in Markdown
+
+    return rt;
+  });
 }
