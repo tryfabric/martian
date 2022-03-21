@@ -167,7 +167,7 @@ export function table(children: Block[] = [], tableWidth: number): Block {
   } as Block;
 }
 
-export function tableRow(cells: Block[][] = []): Block {
+export function tableRow(cells: RichText[][] = []): Block {
   return {
     object: 'block',
     type: 'table_row',

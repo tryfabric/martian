@@ -99,20 +99,23 @@ const hello = "hello";
       const actual = markdownToBlocks(text, {allowUnsupported: true});
       const expected = [
         notion.headingOne([notion.richText('Table')]),
-        notion.table([
-          notion.tableRow([
-            [ notion.richText('First Header') ],
-            [ notion.richText('Second Header') ],
-          ]),
-          notion.tableRow([
-            [ notion.richText('Content Cell') ],
-            [ notion.richText('Content Cell') ],
-          ]),
-          notion.tableRow([
-            [ notion.richText('Content Cell') ],
-            [ notion.richText('Content Cell') ],
-          ]),
-        ], 2),
+        notion.table(
+          [
+            notion.tableRow([
+              [notion.richText('First Header')],
+              [notion.richText('Second Header')],
+            ]),
+            notion.tableRow([
+              [notion.richText('Content Cell')],
+              [notion.richText('Content Cell')],
+            ]),
+            notion.tableRow([
+              [notion.richText('Content Cell')],
+              [notion.richText('Content Cell')],
+            ]),
+          ],
+          2
+        ),
       ];
 
       expect(expected).toStrictEqual(actual);
