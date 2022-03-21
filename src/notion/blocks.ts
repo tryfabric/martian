@@ -162,6 +162,7 @@ export function table(children: Block[] = [], tableWidth: number): Block {
     type: 'table',
     table: {
       table_width: tableWidth,
+      has_row_header: true,
       children: children.length ? children : undefined,
     },
   } as Block;
