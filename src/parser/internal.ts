@@ -1,15 +1,15 @@
 import * as md from '../markdown';
 import * as notion from '../notion';
 import {URL} from 'url';
-import {LIMITS, SUPPORTED_CODE_BLOCK_LANGUAGES} from '../notion';
+import {isSupportedCodeLang, LIMITS} from '../notion';
 
 function ensureLength(text: string, copy?: object) {
   const chunks = text.match(/[^]{1,2000}/g) || [];
   return chunks.flatMap((item: string) => notion.richText(item, copy));
 }
 
-function ensureCodeBlockLanguage(lang?: string): string | undefined {
-  if (lang && SUPPORTED_CODE_BLOCK_LANGUAGES.includes(lang)) {
+function ensureCodeBlockLanguage(lang?: string) {
+  if (lang && isSupportedCodeLang(lang)) {
     return lang;
   }
 

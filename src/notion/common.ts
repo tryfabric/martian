@@ -127,4 +127,10 @@ export const SUPPORTED_CODE_BLOCK_LANGUAGES = [
   'xml',
   'yaml',
   'java/c/c++/c#',
-];
+] as const;
+
+export type supportedCodeLang = typeof SUPPORTED_CODE_BLOCK_LANGUAGES[number];
+
+export function isSupportedCodeLang(lang: string): lang is supportedCodeLang {
+  return (SUPPORTED_CODE_BLOCK_LANGUAGES as readonly string[]).includes(lang);
+}
