@@ -117,6 +117,42 @@ const hello = "hello";
 
       expect(expected).toStrictEqual(actual);
     });
+
+    it('should convert markdown to blocks - deal with images - strict mode', () => {
+      const text = fs.readFileSync('test/fixtures/images.md').toString();
+      const actual = markdownToBlocks(text, {strictImageUrls: true});
+
+      const expected = [
+        notion.headingOne([notion.richText('Images')]),
+        notion.paragraph([
+          notion.richText('This is an image in a paragraph '),
+          notion.richText(', which isnt supported in Notion.'),
+        ]),
+        notion.image('https://image.com/url.jpg'),
+        notion.image('https://image.com/paragraph.jpg'),
+        notion.paragraph([notion.richText('https://image.com/blah')]),
+      ];
+
+      expect(expected).toStrictEqual(actual);
+    });
+
+    it('should convert markdown to blocks - deal with images - not strict mode', () => {
+      const text = fs.readFileSync('test/fixtures/images.md').toString();
+      const actual = markdownToBlocks(text, {strictImageUrls: false});
+
+      const expected = [
+        notion.headingOne([notion.richText('Images')]),
+        notion.paragraph([
+          notion.richText('This is an image in a paragraph '),
+          notion.richText(', which isnt supported in Notion.'),
+        ]),
+        notion.image('https://image.com/url.jpg'),
+        notion.image('https://image.com/paragraph.jpg'),
+        notion.image('https://image.com/blah'),
+      ];
+
+      expect(expected).toStrictEqual(actual);
+    });
   });
 
   describe('markdownToRichText', () => {

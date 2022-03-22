@@ -30,6 +30,7 @@ import gfm from 'remark-gfm';
  */
 export function markdownToBlocks(
   body: string,
+
   options?: BlocksOptions
 ): notion.Block[] {
   const root = unified().use(markdown).use(gfm).parse(body);

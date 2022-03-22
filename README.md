@@ -15,32 +15,147 @@ Designed to make using the Notion SDK and API easier. Notion API version 0.4.5.
 
 ### Supported Markdown Elements
 
-- All inline elements (italics, bold, strikethrough, inline code, hyperlinks)
-- Lists (ordered, unordered, checkboxes) - to any level of depth
-- All headers (header levels >= 3 are treated as header level 3)
-- Code blocks
-- Block quotes
-- Images (where the image is the first element in the paragraph and it has a valid full URL)
+* All inline elements (italics, bold, strikethrough, inline code, hyperlinks)
+* Lists (ordered, unordered, checkboxes) - to any level of depth
+* All headers (header levels >= 3 are treated as header level 3)
+* Code blocks
+* Block quotes
+* Images
+  - Inline images are extracted from the paragraph and added afterwards (as these are not supported in notion)
+  - Image urls are validated, if they are not valid as per the Notion external spec, they will be inserted as text for you to fix manually 
 
-## Unsupported Markdown Elements
+## Usage
+
+```ts
+import {markdownToBlocks, markdownToRichText} from '@instantish/martian';
+import type {RichText, Block} from '@notionhq/client/build/src/api-types';
+
+const richText: RichText[] = markdownToRichText(`**Hello _world_**`);
+
+// [
+//   {
+//     "type": "text",
+//     "annotations": {
+//       "bold": true,
+//     },
+//     "text": {
+//       "content": "Hello "
+//     }
+//   },
+//   {
+//     "type": "text",
+//     "annotations": {
+//       "bold": true,
+//       "italic": true,
+//     },
+//     "text": {
+//       "content": "world"
+//     }
+//   }
+// ]
+
+const options = { allowUnsupportedObjectType: false, strictImageUrls: true };
+const blocks: Block[] = markdownToBlocks(`
+## this is a _heading 2_
+
+* [x] todo list item
+`, options);
+
+// [
+//   {
+//     "object": "block",
+//     "type": "heading_2",
+//     "heading_2": {
+//       "text": [
+//         ...
+//         {
+//           "type": "text",
+//           "annotations": {
+//             "italic": true
+//           }
+//           "text": {
+//             "content": "heading 2"
+//           }
+//         },
+//       ]
+//     }
+//   },
+//   {
+//     "object": "block",
+//     "type": "to_do",
+//     "to_do": {
+//       "text": [
+//         {
+//           "type": "text",
+//           "annotations": {
+//           },
+//           "text": {
+//             "content": "todo list item"
+//           }
+//         }
+//       ],
+//       "checked": true
+//     }
+//   }
+// ]
+```
+
+### Images - Strict Mode
+
+By default, Notion will reject the entire document if you add a block that has an image with an invalid URL (this is not that nice), so by default this will parse in 'Strict Mode' where the image url is parsed, and if not valid, the image is actually parsed as text and added to the document.
+
+In some instances, for example, you are parsing markdown where the image references are local file paths, you may want to allow them to flow through, so that in your client code you can upload the images somewhere and then update the URL paths to point to them before loading into Notion.
+
+Default (strict mode enabled):
+
+```ts
+const options = { strictImageUrls: true };
+const blocks: Block[] = markdownToBlocks(`
+![image-invalid](https://image.com/blah)
+`)
+//  {
+//     "type": "text",
+//     "annotations": {
+//       ...
+//     },
+//     "text": {
+//       "content": "https://image.com/blah"
+//     }
+//   }
+```
+
+Strict mode disabled: 
+
+```ts
+const options = { strictImageUrls: false };
+const blocks: Block[] = markdownToBlocks(`
+![image-invalid](https://image.com/blah)
+`)
+//  {
+//     "type": "image",
+//     "image": {
+//       "url": "https://image.com/blah"
+//     }
+//   }
+```
+
+### Unsupported Markdown Elements
 
 _tables_: Tables can be imported in an [unsupported mode](https://developers.notion.com/reference/block) if you add a flag to the parser.
 
 First, the default mode - it ignores the tables:
 
 ```ts
-const allowUnsupportedObjectType = false;
-const blocks: Block[] = markdownToBlocks(
-  `
+const options = { allowUnsupportedObjectType: false };
+const blocks: Block[] = markdownToBlocks(`
+
 # Table
 
 | First Header  | Second Header |
 | ------------- | ------------- |
 | Content Cell  | Content Cell  |
 | Content Cell  | Content Cell  |
-`,
-  allowUnsupportedObjectType
-);
+`, options);
 
 // [
 //   {
@@ -71,7 +186,7 @@ const blocks: Block[] = markdownToBlocks(
 Next, with unsupported flag = true (note the `annotations` have been removed from the returned object to make it easier to see what is going on):
 
 ```ts
-const allowUnsupportedObjectType = true;
+const options = { allowUnsupportedObjectType: true };
 const blocks: Block[] = markdownToBlocks(`
 # Table
 
@@ -79,7 +194,7 @@ const blocks: Block[] = markdownToBlocks(`
 | ------------- | ------------- |
 | Content Cell  | Content Cell  |
 | Content Cell  | Content Cell  |
-`, allowUnsupportedObjectType)
+`, options)
 
  [
 //   {

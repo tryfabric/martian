@@ -1,5 +1,6 @@
 import * as md from '../markdown';
 import * as notion from '../notion';
+import path from 'path';
 import {URL} from 'url';
 import {LIMITS} from '../notion';
 
@@ -48,24 +49,46 @@ function parseInline(
   }
 }
 
-function parseParagraph(element: md.Paragraph): notion.Block {
-  // If a paragraph containts an image element as its first element
-  // Lets assume it is an image, and parse it as only that (discard remaining content)
-  const isImage = element.children[0].type === 'image';
-  if (isImage) {
-    const image = element.children[0] as md.Image;
-    try {
-      new URL(image.url);
-      return notion.image(image.url);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(
-        `${error.input} is not a valid url, I will process this as text for you to fix later`
-      );
-    }
+function parseImage(image: md.Image, options: BlocksOptions): notion.Block {
+  // https://developers.notion.com/reference/block#image-blocks
+  const allowedTypes = [
+    '.png',
+    '.jpg',
+    '.jpeg',
+    '.gif',
+    '.tif',
+    '.tiff',
+    '.bmp',
+    '.svg',
+    '.heic',
+  ];
+
+  function dealWithError() {
+    return notion.paragraph([notion.richText(image.url)]);
   }
 
-  // Paragraphs can also be legacy 'TOC' from some markdown
+  try {
+    if (options.strictImageUrls ?? true) {
+      const parsedUrl = new URL(image.url);
+      const fileType = path.extname(parsedUrl.pathname);
+      if (allowedTypes.includes(fileType)) {
+        return notion.image(image.url);
+      } else {
+        return dealWithError();
+      }
+    } else {
+      return notion.image(image.url);
+    }
+  } catch (error: unknown) {
+    return dealWithError();
+  }
+}
+
+function parseParagraph(
+  element: md.Paragraph,
+  options: BlocksOptions
+): notion.Block[] {
+  // Paragraphs can also be legacy 'TOC' from some markdown, so we check first
   const mightBeToc =
     element.children.length > 2 &&
     element.children[0].type === 'text' &&
@@ -75,18 +98,39 @@ function parseParagraph(element: md.Paragraph): notion.Block {
     const emphasisItem = element.children[1] as md.Emphasis;
     const emphasisTextItem = emphasisItem.children[0] as md.Text;
     if (emphasisTextItem.value === 'TOC') {
-      return notion.table_of_contents();
+      return [notion.table_of_contents()];
     }
   }
 
-  const text = element.children.flatMap(child => parseInline(child));
-  return notion.paragraph(text);
+  // Notion doesn't deal with inline images, so we need to parse them all out
+  // of the paragraph into individual blocks
+  const images: notion.Block[] = [];
+  const paragraphs: Array<notion.RichText[]> = [];
+  element.children.forEach(item => {
+    if (item.type === 'image') {
+      images.push(parseImage(item, options));
+    } else {
+      const richText = parseInline(item) as notion.RichText[];
+      if (richText.length) {
+        paragraphs.push(richText);
+      }
+    }
+  });
+
+  if (paragraphs.length) {
+    return [notion.paragraph(paragraphs.flat()), ...images];
+  } else {
+    return images;
+  }
 }
 
-function parseBlockquote(element: md.Blockquote): notion.Block {
+function parseBlockquote(
+  element: md.Blockquote,
+  options: BlocksOptions
+): notion.Block {
   // Quotes can only contain RichText[], but come through as Block[]
   // This code collects and flattens the common ones
-  const blocks = element.children.flatMap(child => parseNode(child));
+  const blocks = element.children.flatMap(child => parseNode(child, options));
   const paragraphs = blocks.flatMap(child => child as notion.Block);
   const richtext = paragraphs.flatMap(child => {
     if (child.paragraph) {
@@ -126,7 +170,7 @@ function parseCode(element: md.Code): notion.Block {
   return notion.code(text);
 }
 
-function parseList(element: md.List): notion.Block[] {
+function parseList(element: md.List, options: BlocksOptions): notion.Block[] {
   return element.children.flatMap(item => {
     const paragraph = item.children.shift();
     if (paragraph === undefined || paragraph.type !== 'paragraph') {
@@ -137,7 +181,7 @@ function parseList(element: md.List): notion.Block[] {
 
     // Now process any of the children
     const parsedChildren: notion.Block[] = item.children.flatMap(child =>
-      parseNode(child)
+      parseNode(child, options)
     );
 
     if (element.start !== null && element.start !== undefined) {
@@ -165,25 +209,28 @@ function parseTable(node: md.Table): notion.Block[] {
   return [notion.table(tableRows)];
 }
 
-function parseNode(node: md.FlowContent, unsupported = false): notion.Block[] {
+function parseNode(
+  node: md.FlowContent,
+  options: BlocksOptions
+): notion.Block[] {
   switch (node.type) {
     case 'heading':
       return [parseHeading(node)];
 
     case 'paragraph':
-      return [parseParagraph(node)];
+      return parseParagraph(node, options);
 
     case 'code':
       return [parseCode(node)];
 
     case 'blockquote':
-      return [parseBlockquote(node)];
+      return [parseBlockquote(node, options)];
 
     case 'list':
-      return parseList(node);
+      return parseList(node, options);
 
     case 'table':
-      if (unsupported) {
+      if (options.allowUnsupported) {
         return parseTable(node);
       } else {
         return [];
@@ -216,15 +263,16 @@ export interface CommonOptions {
 export interface BlocksOptions extends CommonOptions {
   /** Whether to allow unsupported object types. */
   allowUnsupported?: boolean;
+
+  /** Whether to render invalid images as text */
+  strictImageUrls?: boolean;
 }
 
 export function parseBlocks(
   root: md.Root,
   options?: BlocksOptions
 ): notion.Block[] {
-  const parsed = root.children.flatMap(item =>
-    parseNode(item, options?.allowUnsupported === true)
-  );
+  const parsed = root.children.flatMap(item => parseNode(item, options || {}));
 
   const truncate = !!(options?.notionLimits?.truncate ?? true),
     limitCallback = options?.notionLimits?.onError ?? (() => {});
