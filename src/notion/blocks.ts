@@ -1,3 +1,5 @@
+import {supportedCodeLang} from './common';
+
 /*
  * Notion SDK no longer exports types, so these are generic
  */
@@ -40,13 +42,16 @@ export function paragraph(text: RichText[]): Block {
   } as Block;
 }
 
-export function code(text: RichText[]): Block {
+export function code(
+  text: RichText[],
+  lang: supportedCodeLang = 'plain text'
+): Block {
   return {
     object: 'block',
     type: 'code',
     code: {
       rich_text: text,
-      language: 'javascript',
+      language: lang,
     },
   } as Block;
 }
