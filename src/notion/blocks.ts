@@ -15,7 +15,7 @@ export interface Block {
 }
 
 export interface BlockText {
-  text: RichText[];
+  rich_text: RichText[];
 }
 
 export interface RichText {
@@ -35,7 +35,7 @@ export function paragraph(text: RichText[]): Block {
     object: 'block',
     type: 'paragraph',
     paragraph: {
-      text: text,
+      rich_text: text,
     },
   } as Block;
 }
@@ -45,7 +45,7 @@ export function code(text: RichText[]): Block {
     object: 'block',
     type: 'code',
     code: {
-      text: text,
+      rich_text: text,
       language: 'javascript',
     },
   } as Block;
@@ -56,7 +56,7 @@ export function blockquote(text: RichText[]): Block {
     object: 'block',
     type: 'quote',
     quote: {
-      text: text,
+      rich_text: text,
     },
   } as Block;
 }
@@ -87,7 +87,7 @@ export function headingOne(text: RichText[]): Block {
     object: 'block',
     type: 'heading_1',
     heading_1: {
-      text: text,
+      rich_text: text,
     },
   } as Block;
 }
@@ -97,7 +97,7 @@ export function headingTwo(text: RichText[]): Block {
     object: 'block',
     type: 'heading_2',
     heading_2: {
-      text: text,
+      rich_text: text,
     },
   } as Block;
 }
@@ -107,7 +107,7 @@ export function headingThree(text: RichText[]): Block {
     object: 'block',
     type: 'heading_3',
     heading_3: {
-      text: text,
+      rich_text: text,
     },
   } as Block;
 }
@@ -120,7 +120,7 @@ export function bulletedListItem(
     object: 'block',
     type: 'bulleted_list_item',
     bulleted_list_item: {
-      text: text,
+      rich_text: text,
       children: children.length ? children : undefined,
     },
   } as Block;
@@ -134,7 +134,7 @@ export function numberedListItem(
     object: 'block',
     type: 'numbered_list_item',
     numbered_list_item: {
-      text: text,
+      rich_text: text,
       children: children.length ? children : undefined,
     },
   } as Block;
@@ -149,7 +149,7 @@ export function toDo(
     object: 'block',
     type: 'to_do',
     to_do: {
-      text: text,
+      rich_text: text,
       checked: checked,
       children: children.length ? children : undefined,
     },

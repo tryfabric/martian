@@ -11,7 +11,7 @@ Martian is a Markdown parser to convert any Markdown content to Notion API block
 uses [unified](https://github.com/unifiedjs/unified) to create a Markdown AST, then converts the AST into Notion
 objects.
 
-Designed to make using the Notion SDK and API easier.  Notion API version 0.4.5.
+Designed to make using the Notion SDK and API easier. Notion API version 0.4.5.
 
 ### Supported Markdown Elements
 
@@ -141,13 +141,14 @@ const blocks: Block[] = markdownToBlocks(`
 
 ### Unsupported Markdown Elements
 
-*tables*: Tables can be imported in an [unsupported mode](https://developers.notion.com/reference/block) if you add a flag to the parser.
+_tables_: Tables can be imported in an [unsupported mode](https://developers.notion.com/reference/block) if you add a flag to the parser.
 
 First, the default mode - it ignores the tables:
 
 ```ts
 const options = { allowUnsupportedObjectType: false };
 const blocks: Block[] = markdownToBlocks(`
+
 # Table
 
 | First Header  | Second Header |
@@ -161,7 +162,7 @@ const blocks: Block[] = markdownToBlocks(`
 //     "object": "block",
 //     "type": "heading_1",
 //     "heading_1": {
-//       "text": [
+//       "rich_text": [
 //         {
 //           "type": "text",
 //           "annotations": {
@@ -184,7 +185,6 @@ const blocks: Block[] = markdownToBlocks(`
 
 Next, with unsupported flag = true (note the `annotations` have been removed from the returned object to make it easier to see what is going on):
 
-
 ```ts
 const options = { allowUnsupportedObjectType: true };
 const blocks: Block[] = markdownToBlocks(`
@@ -201,7 +201,7 @@ const blocks: Block[] = markdownToBlocks(`
 //     "object": "block",
 //     "type": "heading_1",
 //     "heading_1": {
-//       "text": [
+//       "rich_text": [
 //         {
 //           "type": "text",
 //           "text": {
@@ -330,7 +330,82 @@ const blocks: Block[] = markdownToBlocks(`
 // ]
 ```
 
-Note that if you send this document to Notion with the current version of the API it *will* fail, but this allows you to pre-parse the blocks in your client library, and do something with the tables.  In one example, the tables are being parsed out of the blocks, databases being created, that are then linked back to the imported page:  https://github.com/infinitaslearning/notionater/blob/main/index.js#L81-L203
+Note that if you send this document to Notion with the current version of the API it _will_ fail, but this allows you to pre-parse the blocks in your client library, and do something with the tables. In one example, the tables are being parsed out of the blocks, databases being created, that are then linked back to the imported page: https://github.com/infinitaslearning/notionater/blob/main/index.js#L81-L203
+
+## Usage
+
+```ts
+import {markdownToBlocks, markdownToRichText} from '@instantish/martian';
+import type {RichText, Block} from '@notionhq/client/build/src/api-types';
+
+const richText: RichText[] = markdownToRichText(`**Hello _world_**`);
+
+// [
+//   {
+//     "type": "text",
+//     "annotations": {
+//       "bold": true,
+//     },
+//     "text": {
+//       "content": "Hello "
+//     }
+//   },
+//   {
+//     "type": "text",
+//     "annotations": {
+//       "bold": true,
+//       "italic": true,
+//     },
+//     "text": {
+//       "content": "world"
+//     }
+//   }
+// ]
+
+const blocks: Block[] = markdownToBlocks(`
+## this is a _heading 2_
+
+* [x] todo list item
+`);
+
+// [
+//   {
+//     "object": "block",
+//     "type": "heading_2",
+//     "heading_2": {
+//       "rich_text": [
+//         ...
+//         {
+//           "type": "text",
+//           "annotations": {
+//             "italic": true
+//           }
+//           "text": {
+//             "content": "heading 2"
+//           }
+//         },
+//       ]
+//     }
+//   },
+//   {
+//     "object": "block",
+//     "type": "to_do",
+//     "to_do": {
+//       "rich_text": [
+//         {
+//           "type": "text",
+//           "annotations": {
+//           },
+//           "text": {
+//             "content": "todo list item"
+//           }
+//         }
+//       ],
+//       "checked": true
+//     }
+//   }
+// ]
+```
 
 ---
 

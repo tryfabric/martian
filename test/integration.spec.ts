@@ -63,8 +63,8 @@ const hello = "hello";
       const text = fs.readFileSync('test/fixtures/large-item.md').toString();
       const actual = markdownToBlocks(text);
 
-      const paragraph = actual[1].paragraph as unknown as notion.RichText;
-      const textArray = paragraph.text as unknown as Array<object>;
+      const paragraph = actual[1].paragraph as unknown as notion.BlockText;
+      const textArray = paragraph.rich_text as unknown as Array<object>;
 
       expect(textArray.length).toStrictEqual(9);
     });

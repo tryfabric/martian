@@ -134,16 +134,16 @@ function parseBlockquote(
   const paragraphs = blocks.flatMap(child => child as notion.Block);
   const richtext = paragraphs.flatMap(child => {
     if (child.paragraph) {
-      return child.paragraph.text as notion.RichText[];
+      return child.paragraph.rich_text as notion.RichText[];
     }
     if (child.heading_1) {
-      return child.heading_1.text as notion.RichText[];
+      return child.heading_1.rich_text as notion.RichText[];
     }
     if (child.heading_2) {
-      return child.heading_2.text as notion.RichText[];
+      return child.heading_2.rich_text as notion.RichText[];
     }
     if (child.heading_3) {
-      return child.heading_3.text as notion.RichText[];
+      return child.heading_3.rich_text as notion.RichText[];
     }
     return [];
   });
