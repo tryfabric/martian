@@ -97,8 +97,10 @@ const hello = "hello";
       const text = fs.readFileSync('test/fixtures/large-item.md').toString();
       const actual = markdownToBlocks(text);
 
-      const paragraph = actual[1].paragraph as unknown as notion.BlockText;
-      const textArray = paragraph.rich_text as unknown as Array<object>;
+      const textArray =
+        actual[1].type === 'paragraph'
+          ? actual[1].paragraph.rich_text
+          : {length: -1};
 
       expect(textArray.length).toStrictEqual(9);
     });
@@ -111,6 +113,7 @@ const hello = "hello";
         notion.headingOne([notion.richText('List')]),
         notion.bulletedListItem(
           [notion.richText('Item 1')],
+          // @ts-expect-error This problem is being addressed in issue #15 (https://github.com/instantish/martian/issues/15)
           [notion.bulletedListItem([notion.richText('Sub Item 1')])]
         ),
         notion.bulletedListItem([notion.richText('Item 2')]),

@@ -142,16 +142,16 @@ function parseBlockquote(
   const blocks = element.children.flatMap(child => parseNode(child, options));
   const paragraphs = blocks.flatMap(child => child as notion.Block);
   const richtext = paragraphs.flatMap(child => {
-    if (child.paragraph) {
+    if (child.type === 'paragraph') {
       return child.paragraph.rich_text as notion.RichText[];
     }
-    if (child.heading_1) {
+    if (child.type === 'heading_1') {
       return child.heading_1.rich_text as notion.RichText[];
     }
-    if (child.heading_2) {
+    if (child.type === 'heading_2') {
       return child.heading_2.rich_text as notion.RichText[];
     }
-    if (child.heading_3) {
+    if (child.type === 'heading_3') {
       return child.heading_3.rich_text as notion.RichText[];
     }
     return [];
@@ -190,8 +190,9 @@ function parseList(element: md.List, options: BlocksOptions): notion.Block[] {
     const text = paragraph.children.flatMap(child => parseInline(child));
 
     // Now process any of the children
-    const parsedChildren: notion.Block[] = item.children.flatMap(child =>
-      parseNode(child, options)
+    const parsedChildren: notion.BlockWithoutChildren[] = item.children.flatMap(
+      child =>
+        parseNode(child, options) as unknown as notion.BlockWithoutChildren
     );
 
     if (element.start !== null && element.start !== undefined) {
@@ -208,7 +209,7 @@ function parseTableCell(node: md.TableCell): notion.RichText[][] {
   return [node.children.flatMap(child => parseInline(child))];
 }
 
-function parseTableRow(node: md.TableRow): notion.Block[] {
+function parseTableRow(node: md.TableRow): notion.BlockWithoutChildren[] {
   const tableCells = node.children.flatMap(child => parseTableCell(child));
   return [notion.tableRow(tableCells)];
 }
@@ -331,6 +332,8 @@ export function parseRichText(
   return (
     truncate ? richTexts.slice(0, LIMITS.RICH_TEXT_ARRAYS) : richTexts
   ).map(rt => {
+    if (rt.type !== 'text') return rt;
+
     if (rt.text.content.length > LIMITS.RICH_TEXT.TEXT_CONTENT) {
       limitCallback(
         new Error(
