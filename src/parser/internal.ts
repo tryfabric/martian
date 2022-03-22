@@ -9,8 +9,9 @@ function ensureLength(text: string, copy?: object) {
 }
 
 function ensureCodeBlockLanguage(lang?: string) {
-  if (lang && isSupportedCodeLang(lang)) {
-    return lang;
+  if (lang) {
+    lang = lang.toLowerCase();
+    return isSupportedCodeLang(lang) ? lang : notion.parseCodeLanguage(lang);
   }
 
   return undefined;

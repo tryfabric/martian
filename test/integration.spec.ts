@@ -23,13 +23,13 @@ hello _world_
         notion.toDo(true, [notion.richText('todo')]),
       ];
 
-      expect(expected).toStrictEqual(actual);
+      expect(actual).toStrictEqual(expected);
     });
 
-    it('should deal with code', () => {
+    it('should deal with code - use plain text by default', () => {
       const text = `
 ## Code
-\`\`\` javascript
+\`\`\`
 const hello = "hello";
 \`\`\`
 `;
@@ -37,10 +37,44 @@ const hello = "hello";
 
       const expected = [
         notion.headingTwo([notion.richText('Code')]),
-        notion.code([notion.richText('const hello = "hello";')]),
+        notion.code([notion.richText('const hello = "hello";')], 'plain text'),
       ];
 
-      expect(expected).toStrictEqual(actual);
+      expect(actual).toStrictEqual(expected);
+    });
+
+    it('should deal with code - handle Notion highlight keys', () => {
+      const text = `
+## Code
+\`\`\` webassembly
+const hello = "hello";
+\`\`\`
+`;
+      const actual = markdownToBlocks(text);
+
+      const expected = [
+        notion.headingTwo([notion.richText('Code')]),
+        notion.code([notion.richText('const hello = "hello";')], 'webassembly'),
+      ];
+
+      expect(actual).toStrictEqual(expected);
+    });
+
+    it('should deal with code - handle Linguist highlight keys', () => {
+      const text = `
+## Code
+\`\`\` ts
+const hello = "hello";
+\`\`\`
+`;
+      const actual = markdownToBlocks(text);
+
+      const expected = [
+        notion.headingTwo([notion.richText('Code')]),
+        notion.code([notion.richText('const hello = "hello";')], 'typescript'),
+      ];
+
+      expect(actual).toStrictEqual(expected);
     });
 
     it('should deal with complex items', () => {
@@ -56,7 +90,7 @@ const hello = "hello";
         notion.table_of_contents(),
       ];
 
-      expect(expected).toStrictEqual(actual);
+      expect(actual).toStrictEqual(expected);
     });
 
     it('should break up large elements', () => {
@@ -82,7 +116,7 @@ const hello = "hello";
         notion.bulletedListItem([notion.richText('Item 2')]),
       ];
 
-      expect(expected).toStrictEqual(actual);
+      expect(actual).toStrictEqual(expected);
     });
 
     it('should skip tables if unsupported = false', () => {
@@ -91,7 +125,7 @@ const hello = "hello";
         allowUnsupported: false,
       });
       const expected = [notion.headingOne([notion.richText('Table')])];
-      expect(expected).toStrictEqual(actual);
+      expect(actual).toStrictEqual(expected);
     });
 
     it('should include tables if unsupported = true', () => {
@@ -115,7 +149,7 @@ const hello = "hello";
         ]),
       ];
 
-      expect(expected).toStrictEqual(actual);
+      expect(actual).toStrictEqual(expected);
     });
   });
 
@@ -132,7 +166,7 @@ const hello = "hello";
         }),
       ];
 
-      expect(expected).toStrictEqual(actual);
+      expect(actual).toStrictEqual(expected);
     });
 
     it('should convert markdown with multiple newlines to rich text', () => {
@@ -146,7 +180,7 @@ const hello = "hello";
         }),
       ];
 
-      expect(expected).toStrictEqual(actual);
+      expect(actual).toStrictEqual(expected);
     });
 
     it('should truncate items when options.notionLimits.truncate = true', () => {

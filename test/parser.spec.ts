@@ -104,8 +104,7 @@ describe('gfm parser', () => {
     expect(actual).toStrictEqual(expected);
   });
 
-  it('should parse code block and set the language to javascript \
-    if none is provided', () => {
+  it('should parse code block and set the language to plain text if none is provided', () => {
     const ast = md.root(
       md.paragraph(md.text('hello')),
       md.code('const foo = () => {}', undefined)
@@ -115,7 +114,7 @@ describe('gfm parser', () => {
 
     const expected = [
       notion.paragraph([notion.richText('hello')]),
-      notion.code([notion.richText('const foo = () => {}')], 'javascript'),
+      notion.code([notion.richText('const foo = () => {}')], 'plain text'),
     ];
     expect(actual).toStrictEqual(expected);
   });
@@ -136,8 +135,7 @@ describe('gfm parser', () => {
     expect(actual).toStrictEqual(expected);
   });
 
-  it('should parse code block and set the language to javascript \
-      if it is not supported by Notion', () => {
+  it('should parse code block and set the language to plain text if it is not supported by Notion', () => {
     const ast = md.root(
       md.paragraph(md.text('hello')),
       md.code('const foo = () => {}', 'not-supported')
@@ -147,7 +145,7 @@ describe('gfm parser', () => {
 
     const expected = [
       notion.paragraph([notion.richText('hello')]),
-      notion.code([notion.richText('const foo = () => {}')], 'javascript'),
+      notion.code([notion.richText('const foo = () => {}')], 'plain text'),
     ];
 
     expect(actual).toStrictEqual(expected);
