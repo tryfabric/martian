@@ -194,9 +194,8 @@ function parseList(element: md.List, options: BlocksOptions): notion.Block[] {
   });
 }
 
-function parseTableCell(node: md.TableCell): notion.Block[] {
-  const text = node.children.flatMap(child => parseInline(child));
-  return [notion.tableCell(text)];
+function parseTableCell(node: md.TableCell): notion.RichText[][] {
+  return [node.children.flatMap(child => parseInline(child))];
 }
 
 function parseTableRow(node: md.TableRow): notion.Block[] {
@@ -205,8 +204,13 @@ function parseTableRow(node: md.TableRow): notion.Block[] {
 }
 
 function parseTable(node: md.Table): notion.Block[] {
+  // The width of the table is the amount of cells in the first row, as all rows must have the same number of cells
+  const tableWidth = node.children?.length
+    ? node.children[0].children.length
+    : 0;
+
   const tableRows = node.children.flatMap(child => parseTableRow(child));
-  return [notion.table(tableRows)];
+  return [notion.table(tableRows, tableWidth)];
 }
 
 function parseNode(
