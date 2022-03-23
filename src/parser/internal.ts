@@ -123,7 +123,7 @@ function parseHeading(element: md.Heading): notion.Block {
 
 function parseCode(element: md.Code): notion.Block {
   const text = ensureLength(element.value);
-  return notion.code(text);
+  return notion.code(text, element.lang);
 }
 
 function parseList(element: md.List): notion.Block[] {

@@ -32,12 +32,16 @@ hello _world_
 \`\`\` javascript
 const hello = "hello";
 \`\`\`
+\`\`\` python
+print("hello")
+\`\`\`
 `;
       const actual = markdownToBlocks(text);
 
       const expected = [
         notion.headingTwo([notion.richText('Code')]),
         notion.code([notion.richText('const hello = "hello";')]),
+        notion.code([notion.richText('print("hello")')], 'python'),
       ];
 
       expect(expected).toStrictEqual(actual);

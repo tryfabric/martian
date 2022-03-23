@@ -114,7 +114,7 @@ describe('gfm parser', () => {
 
     const expected = [
       notion.paragraph([notion.richText('hello')]),
-      notion.code([notion.richText('public class Foo {}')]),
+      notion.code([notion.richText('public class Foo {}')], 'java'),
     ];
 
     expect(actual).toStrictEqual(expected);
