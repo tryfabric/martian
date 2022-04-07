@@ -3,6 +3,7 @@
   "version": "1.2.0",
   "description": "Converts Markdown to Notion Blocks and RichText",
   "repository": "https://github.com/instantish/martian",
+  "publishConfig": { "registry": "https://npm.pkg.github.com/@tryfabric" },
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "scripts": {
