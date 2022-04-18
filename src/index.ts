@@ -9,6 +9,7 @@ import {
 } from './parser/internal';
 import type * as md from './markdown';
 import gfm from 'remark-gfm';
+import remarkMath from 'remark-math';
 
 /**
  * Parses Markdown content into Notion Blocks.
@@ -33,7 +34,7 @@ export function markdownToBlocks(
 
   options?: BlocksOptions
 ): notion.Block[] {
-  const root = unified().use(markdown).use(gfm).parse(body);
+  const root = unified().use(markdown).use(gfm).use(remarkMath).parse(body);
   return parseBlocks(root as unknown as md.Root, options);
 }
 

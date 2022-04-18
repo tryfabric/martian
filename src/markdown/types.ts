@@ -60,6 +60,10 @@ export interface Code extends Literal {
   meta?: string;
 }
 
+export interface Math extends Literal {
+  type: 'math';
+}
+
 export interface Definition extends Node {
   type: 'definition';
 }
@@ -85,6 +89,10 @@ export interface Delete extends Parent {
 
 export interface InlineCode extends Literal {
   type: 'inlineCode';
+}
+
+export interface InlineMath extends Literal {
+  type: 'inlineMath';
 }
 
 export interface Break extends Node {
@@ -147,7 +155,8 @@ export type FlowContent =
   | ImageReference
   | ThematicBreak
   | Content
-  | Table;
+  | Table
+  | Math;
 
 export type Content = Definition | Paragraph;
 
@@ -164,7 +173,8 @@ export type StaticPhrasingContent =
   | InlineCode
   | Strong
   | Text
-  | Delete;
+  | Delete
+  | InlineMath;
 
 export type TableContent = TableRow;
 

@@ -7,10 +7,12 @@ import type {
   Heading,
   Image,
   InlineCode,
+  InlineMath,
   Link,
   List,
   ListContent,
   ListItem,
+  Math,
   Paragraph,
   PhrasingContent,
   Root,
@@ -59,6 +61,13 @@ export function inlineCode(value: string): InlineCode {
   };
 }
 
+export function inlineMath(value: string): InlineMath {
+  return {
+    type: 'inlineMath',
+    value,
+  };
+}
+
 export function paragraph(...children: PhrasingContent[]): Paragraph {
   return {
     type: 'paragraph',
@@ -103,6 +112,13 @@ export function code(value: string, lang: string | undefined): Code {
     type: 'code',
     lang: lang,
     value: value,
+  };
+}
+
+export function math(value: string): Math {
+  return {
+    type: 'math',
+    value,
   };
 }
 

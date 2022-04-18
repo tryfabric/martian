@@ -165,3 +165,12 @@ export function tableRow(cells: RichText[][] = []): BlockWithoutChildren {
     },
   };
 }
+
+export function equation(value: string): Block {
+  return {
+    type: 'equation',
+    equation: {
+      expression: value,
+    },
+  };
+}

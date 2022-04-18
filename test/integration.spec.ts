@@ -193,6 +193,24 @@ const hello = "hello";
 
       expect(actual).toStrictEqual(expected);
     });
+
+    it('should parse math', () => {
+      const text = fs.readFileSync('test/fixtures/math.md').toString();
+      const actual = markdownToBlocks(text);
+
+      const expected = [
+        notion.paragraph([
+          notion.richText('Lift('),
+          notion.richText('L', {type: 'equation'}),
+          notion.richText(') can be determined by Lift Coefficient ('),
+          notion.richText('C_L', {type: 'equation'}),
+          notion.richText(') like the following\nequation.'),
+        ]),
+        notion.equation('L = \\frac{1}{2} \\rho v^2 S C_L\\\\\ntest'),
+      ];
+
+      expect(actual).toStrictEqual(expected);
+    });
   });
 
   describe('markdownToRichText', () => {

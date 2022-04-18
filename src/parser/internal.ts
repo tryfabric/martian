@@ -53,6 +53,9 @@ function parseInline(
       copy.annotations.code = true;
       return [notion.richText(element.value, copy)];
 
+    case 'inlineMath':
+      return [notion.richText(element.value, {...copy, type: 'equation'})];
+
     default:
       return [];
   }
@@ -224,6 +227,11 @@ function parseTable(node: md.Table): notion.Block[] {
   return [notion.table(tableRows, tableWidth)];
 }
 
+function parseMath(node: md.Math): notion.Block {
+  const textWithKatexNewlines = node.value.split('\n').join('\\\\\n');
+  return notion.equation(textWithKatexNewlines);
+}
+
 function parseNode(
   node: md.FlowContent,
   options: BlocksOptions
@@ -250,6 +258,9 @@ function parseNode(
       } else {
         return [];
       }
+
+    case 'math':
+      return [parseMath(node)];
 
     default:
       return [];
