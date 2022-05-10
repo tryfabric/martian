@@ -1,4 +1,4 @@
-import {supportedCodeLang} from './common';
+import {richText, supportedCodeLang} from './common';
 import {AppendBlockChildrenParameters} from '@notionhq/client/build/src/api-endpoints';
 
 export type Block = AppendBlockChildrenParameters['children'][number];
@@ -36,12 +36,18 @@ export function code(
   };
 }
 
-export function blockquote(text: RichText[]): Block {
+export function blockquote(
+  text: RichText[] = [],
+  children: Block[] = []
+): Block {
   return {
     object: 'block',
     type: 'quote',
     quote: {
-      rich_text: text,
+      // By setting an empty rich text we prevent the "Empty quote" line from showing up at all
+      rich_text: text.length ? text : [richText('')],
+      // @ts-expect-error Typings are not perfect
+      children,
     },
   };
 }
