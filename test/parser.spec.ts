@@ -162,12 +162,17 @@ describe('gfm parser', () => {
     const actual = parseBlocks(ast, options);
 
     const expected = [
-      notion.blockquote([
-        notion.richText('hello'),
-        notion.richText('world', {
-          annotations: {italic: true},
-        }),
-      ]),
+      notion.blockquote(
+        [],
+        [
+          notion.headingOne([
+            notion.richText('hello'),
+            notion.richText('world', {
+              annotations: {italic: true},
+            }),
+          ]),
+        ]
+      ),
     ];
 
     expect(actual).toStrictEqual(expected);
