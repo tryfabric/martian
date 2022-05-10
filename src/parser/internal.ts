@@ -140,26 +140,8 @@ function parseBlockquote(
   element: md.Blockquote,
   options: BlocksOptions
 ): notion.Block {
-  // Quotes can only contain RichText[], but come through as Block[]
-  // This code collects and flattens the common ones
-  const blocks = element.children.flatMap(child => parseNode(child, options));
-  const paragraphs = blocks.flatMap(child => child as notion.Block);
-  const richtext = paragraphs.flatMap(child => {
-    if (child.type === 'paragraph') {
-      return child.paragraph.rich_text as notion.RichText[];
-    }
-    if (child.type === 'heading_1') {
-      return child.heading_1.rich_text as notion.RichText[];
-    }
-    if (child.type === 'heading_2') {
-      return child.heading_2.rich_text as notion.RichText[];
-    }
-    if (child.type === 'heading_3') {
-      return child.heading_3.rich_text as notion.RichText[];
-    }
-    return [];
-  });
-  return notion.blockquote(richtext as notion.RichText[]);
+  const children = element.children.flatMap(child => parseNode(child, options));
+  return notion.blockquote([], children);
 }
 
 function parseHeading(element: md.Heading): notion.Block {

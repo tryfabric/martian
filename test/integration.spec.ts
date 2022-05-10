@@ -84,7 +84,7 @@ const hello = "hello";
       const expected = [
         notion.headingOne([notion.richText('Images')]),
         notion.paragraph([notion.richText('This is a paragraph!')]),
-        notion.blockquote([notion.richText('Quote')]),
+        notion.blockquote([], [notion.paragraph([notion.richText('Quote')])]),
         notion.paragraph([notion.richText('Paragraph')]),
         notion.image('https://url.com/image.jpg'),
         notion.table_of_contents(),
