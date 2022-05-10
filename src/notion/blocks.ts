@@ -36,12 +36,16 @@ export function code(
   };
 }
 
-export function blockquote(text: RichText[]): Block {
+export function blockquote(
+  text: RichText[],
+  children: BlockWithoutChildren[] = []
+): Block {
   return {
     object: 'block',
     type: 'quote',
     quote: {
       rich_text: text,
+      children: children.length ? children : undefined,
     },
   };
 }

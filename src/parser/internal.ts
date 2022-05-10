@@ -144,7 +144,7 @@ function parseBlockquote(
   // This code collects and flattens the common ones
   const blocks = element.children.flatMap(child => parseNode(child, options));
   const paragraphs = blocks.flatMap(child => child as notion.Block);
-  const richtext = paragraphs.flatMap(child => {
+  const getRichtext = (child: notion.Block) => {
     if (child.type === 'paragraph') {
       return child.paragraph.rich_text as notion.RichText[];
     }
@@ -158,8 +158,10 @@ function parseBlockquote(
       return child.heading_3.rich_text as notion.RichText[];
     }
     return [];
-  });
-  return notion.blockquote(richtext as notion.RichText[]);
+  };
+  const richtext = paragraphs.length > 0 ? getRichtext(paragraphs[0]) : [];
+  const children = (paragraphs.length > 1 ? paragraphs.slice(1) : []) as notion.BlockWithoutChildren[];
+  return notion.blockquote(richtext as notion.RichText[], children);
 }
 
 function parseHeading(element: md.Heading): notion.Block {
