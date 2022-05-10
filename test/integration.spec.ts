@@ -146,7 +146,7 @@ const hello = "hello";
         ),
       ];
 
-      expect(expected).toStrictEqual(actual);
+      expect(actual).toStrictEqual(expected);
     });
 
     it('should convert markdown to blocks - deal with images - strict mode', () => {
@@ -164,7 +164,7 @@ const hello = "hello";
         notion.paragraph([notion.richText('https://image.com/blah')]),
       ];
 
-      expect(expected).toStrictEqual(actual);
+      expect(actual).toStrictEqual(expected);
     });
 
     it('should convert markdown to blocks - deal with images - not strict mode', () => {
