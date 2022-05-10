@@ -122,18 +122,9 @@ const hello = "hello";
       expect(actual).toStrictEqual(expected);
     });
 
-    it('should skip tables if unsupported = false', () => {
+    it('should deal with tables', () => {
       const text = fs.readFileSync('test/fixtures/table.md').toString();
-      const actual = markdownToBlocks(text, {
-        allowUnsupported: false,
-      });
-      const expected = [notion.headingOne([notion.richText('Table')])];
-      expect(actual).toStrictEqual(expected);
-    });
-
-    it('should include tables if unsupported = true', () => {
-      const text = fs.readFileSync('test/fixtures/table.md').toString();
-      const actual = markdownToBlocks(text, {allowUnsupported: true});
+      const actual = markdownToBlocks(text);
       const expected = [
         notion.headingOne([notion.richText('Table')]),
         notion.table(

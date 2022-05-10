@@ -234,6 +234,17 @@ describe('gfm parser', () => {
           annotations: {strikethrough: true},
         }),
       ]),
+      notion.table(
+        [
+          notion.tableRow([
+            [notion.richText('a')],
+            [notion.richText('b')],
+            [notion.richText('c')],
+            [notion.richText('d')],
+          ]),
+        ],
+        4
+      ),
       notion.toDo(false, [notion.richText('to do')]),
       notion.toDo(true, [notion.richText('done')]),
     ];
