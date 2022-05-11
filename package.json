@@ -1,6 +1,6 @@
 {
   "name": "@instantish/martian",
-  "version": "1.2.3-0",
+  "version": "1.2.3-1",
   "description": "Converts Markdown to Notion Blocks and RichText",
   "repository": "https://github.com/instantish/martian",
   "main": "build/src/index.js",
