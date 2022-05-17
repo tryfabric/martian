@@ -295,21 +295,26 @@ export function parseBlocks(
   return truncate ? parsed.slice(0, LIMITS.PAYLOAD_BLOCKS) : parsed;
 }
 
+export interface RichTextOptions extends CommonOptions {
+  /**
+   * How to behave when a non-inline element is detected:
+   * - `ignore` (default): skip to the next element
+   * - `throw`: throw an error
+   */
+  nonInline?: 'ignore' | 'throw';
+}
+
 export function parseRichText(
   root: md.Root,
-  options?: CommonOptions
+  options?: RichTextOptions
 ): notion.RichText[] {
-  if (root.children[0].type !== 'paragraph') {
-    throw new Error(`Unsupported markdown element: ${JSON.stringify(root)}`);
-  }
-
   const richTexts: notion.RichText[] = [];
-  root.children.forEach(paragraph => {
-    if (paragraph.type === 'paragraph') {
-      paragraph.children.forEach(child =>
-        richTexts.push(...parseInline(child))
-      );
-    }
+
+  root.children.forEach(child => {
+    if (child.type === 'paragraph')
+      child.children.forEach(child => richTexts.push(...parseInline(child)));
+    else if (options?.nonInline === 'throw')
+      throw new Error(`Unsupported markdown element: ${JSON.stringify(child)}`);
   });
 
   const truncate = !!(options?.notionLimits?.truncate ?? true),
