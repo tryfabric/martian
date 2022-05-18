@@ -235,11 +235,7 @@ function parseNode(
       return parseList(node, options);
 
     case 'table':
-      if (options.allowUnsupported) {
-        return parseTable(node);
-      } else {
-        return [];
-      }
+      return parseTable(node);
 
     case 'math':
       return [parseMath(node)];
@@ -269,9 +265,6 @@ export interface CommonOptions {
 }
 
 export interface BlocksOptions extends CommonOptions {
-  /** Whether to allow unsupported object types. */
-  allowUnsupported?: boolean;
-
   /** Whether to render invalid images as text */
   strictImageUrls?: boolean;
 }

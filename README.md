@@ -13,397 +13,273 @@ Designed to make using the Notion SDK and API easier. Notion API version 1.0.
 
 ### Supported Markdown Elements
 
-* All inline elements (italics, bold, strikethrough, inline code, hyperlinks)
-* Lists (ordered, unordered, checkboxes) - to any level of depth
-* All headers (header levels >= 3 are treated as header level 3)
-* Code blocks
-* Block quotes
-* Images
+- All inline elements (italics, bold, strikethrough, inline code, hyperlinks, equations)
+- Lists (ordered, unordered, checkboxes) - to any level of depth
+- All headers (header levels >= 3 are treated as header level 3)
+- Code blocks, with language highlighting support
+- Block quotes
+- Tables
+- Equations
+- Images
   - Inline images are extracted from the paragraph and added afterwards (as these are not supported in notion)
-  - Image urls are validated, if they are not valid as per the Notion external spec, they will be inserted as text for you to fix manually 
+  - Image urls are validated, if they are not valid as per the Notion external spec, they will be inserted as text for you to fix manually
 
 ## Usage
 
+### Basic usage:
+
+The package exports two functions, which you can import like this:
+
 ```ts
+// JS
+const {markdownToBlocks, markdownToRichText} = require('@instantish/martian');
+// TS
 import {markdownToBlocks, markdownToRichText} from '@instantish/martian';
-import type {RichText, Block} from '@notionhq/client/build/src/api-types';
-
-const richText: RichText[] = markdownToRichText(`**Hello _world_**`);
-
-// [
-//   {
-//     "type": "text",
-//     "annotations": {
-//       "bold": true,
-//     },
-//     "text": {
-//       "content": "Hello "
-//     }
-//   },
-//   {
-//     "type": "text",
-//     "annotations": {
-//       "bold": true,
-//       "italic": true,
-//     },
-//     "text": {
-//       "content": "world"
-//     }
-//   }
-// ]
-
-const options = { allowUnsupportedObjectType: false, strictImageUrls: true };
-const blocks: Block[] = markdownToBlocks(`
-## this is a _heading 2_
-
-* [x] todo list item
-`, options);
-
-// [
-//   {
-//     "object": "block",
-//     "type": "heading_2",
-//     "heading_2": {
-//       "text": [
-//         ...
-//         {
-//           "type": "text",
-//           "annotations": {
-//             "italic": true
-//           }
-//           "text": {
-//             "content": "heading 2"
-//           }
-//         },
-//       ]
-//     }
-//   },
-//   {
-//     "object": "block",
-//     "type": "to_do",
-//     "to_do": {
-//       "text": [
-//         {
-//           "type": "text",
-//           "annotations": {
-//           },
-//           "text": {
-//             "content": "todo list item"
-//           }
-//         }
-//       ],
-//       "checked": true
-//     }
-//   }
-// ]
 ```
 
-### Images - Strict Mode
-
-By default, Notion will reject the entire document if you add a block that has an image with an invalid URL (this is not that nice), so by default this will parse in 'Strict Mode' where the image url is parsed, and if not valid, the image is actually parsed as text and added to the document.
-
-In some instances, for example, you are parsing markdown where the image references are local file paths, you may want to allow them to flow through, so that in your client code you can upload the images somewhere and then update the URL paths to point to them before loading into Notion.
-
-Default (strict mode enabled):
+Here are couple of examples with both of them:
 
 ```ts
-const options = { strictImageUrls: true };
-const blocks: Block[] = markdownToBlocks(`
-![image-invalid](https://image.com/blah)
-`)
-//  {
-//     "type": "text",
-//     "annotations": {
-//       ...
-//     },
-//     "text": {
-//       "content": "https://image.com/blah"
-//     }
-//   }
+markdownToRichText(`**Hello _world_**`);
 ```
 
-Strict mode disabled: 
+<details>
+<summary>Result</summary>
+<pre><code>[
+  {
+    "type": "text",
+    "annotations": {
+      "bold": true,
+      "strikethrough": false,
+      "underline": false,
+      "italic": false,
+      "code": false,
+      "color": "default"
+    },
+    "text": {
+      "content": "Hello "
+    }
+  },
+  {
+    "type": "text",
+    "annotations": {
+      "bold": true,
+      "strikethrough": false,
+      "underline": false,
+      "italic": true,
+      "code": false,
+      "color": "default"
+    },
+    "text": {
+      "content": "world"
+    }
+  }
+]</code></pre>
+</details>
 
 ```ts
-const options = { strictImageUrls: false };
-const blocks: Block[] = markdownToBlocks(`
-![image-invalid](https://image.com/blah)
-`)
-//  {
-//     "type": "image",
-//     "image": {
-//       "url": "https://image.com/blah"
-//     }
-//   }
-```
-
-### Unsupported Markdown Elements
-
-_tables_: Tables can be imported in an [unsupported mode](https://developers.notion.com/reference/block) if you add a flag to the parser.
-
-First, the default mode - it ignores the tables:
-
-```ts
-const options = { allowUnsupportedObjectType: false };
-const blocks: Block[] = markdownToBlocks(`
-
-# Table
-
-| First Header  | Second Header |
-| ------------- | ------------- |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-`, options);
-
-// [
-//   {
-//     "object": "block",
-//     "type": "heading_1",
-//     "heading_1": {
-//       "rich_text": [
-//         {
-//           "type": "text",
-//           "annotations": {
-//             "bold": false,
-//             "strikethrough": false,
-//             "underline": false,
-//             "italic": false,
-//             "code": false,
-//             "color": "default"
-//           },
-//           "text": {
-//             "content": "Table"
-//           }
-//         }
-//       ]
-//     }
-//   }
-// ]
-```
-
-Next, with unsupported flag = true (note the `annotations` have been removed from the returned object to make it easier to see what is going on):
-
-```ts
-const options = { allowUnsupportedObjectType: true };
-const blocks: Block[] = markdownToBlocks(`
-# Table
-
-| First Header  | Second Header |
-| ------------- | ------------- |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-`, options)
-
- [
-//   {
-//     "object": "block",
-//     "type": "heading_1",
-//     "heading_1": {
-//       "rich_text": [
-//         {
-//           "type": "text",
-//           "text": {
-//             "content": "Table"
-//           }
-//         }
-//       ]
-//     }
-//   },
-//   {
-//     "object": "unsupported",
-//     "type": "table",
-//     "table": {
-//       "children": [
-//         {
-//           "object": "unsupported",
-//           "type": "table_row",
-//           "table_row": {
-//             "children": [
-//               {
-//                 "object": "unsupported",
-//                 "type": "table_cell",
-//                 "table_cell": {
-//                   "children": [
-//                     {
-//                       "type": "text",
-//                       "text": {
-//                         "content": "First Header"
-//                       }
-//                     }
-//                   ]
-//                 }
-//               },
-//               {
-//                 "object": "unsupported",
-//                 "type": "table_cell",
-//                 "table_cell": {
-//                   "children": [
-//                     {
-//                       "type": "text",
-//                       "text": {
-//                         "content": "Second Header"
-//                       }
-//                     }
-//                   ]
-//                 }
-//               }
-//             ]
-//           }
-//         },
-//         {
-//           "object": "unsupported",
-//           "type": "table_row",
-//           "table_row": {
-//             "children": [
-//               {
-//                 "object": "unsupported",
-//                 "type": "table_cell",
-//                 "table_cell": {
-//                   "children": [
-//                     {
-//                       "type": "text",
-//                       "text": {
-//                         "content": "Content Cell"
-//                       }
-//                     }
-//                   ]
-//                 }
-//               },
-//               {
-//                 "object": "unsupported",
-//                 "type": "table_cell",
-//                 "table_cell": {
-//                   "children": [
-//                     {
-//                       "type": "text",
-//                       "text": {
-//                         "content": "Content Cell"
-//                       }
-//                     }
-//                   ]
-//                 }
-//               }
-//             ]
-//           }
-//         },
-//         {
-//           "object": "unsupported",
-//           "type": "table_row",
-//           "table_row": {
-//             "children": [
-//               {
-//                 "object": "unsupported",
-//                 "type": "table_cell",
-//                 "table_cell": {
-//                   "children": [
-//                     {
-//                       "type": "text",
-//                       "text": {
-//                         "content": "Content Cell"
-//                       }
-//                     }
-//                   ]
-//                 }
-//               },
-//               {
-//                 "object": "unsupported",
-//                 "type": "table_cell",
-//                 "table_cell": {
-//                   "children": [
-//                     {
-//                       "type": "text",
-//                       "text": {
-//                         "content": "Content Cell"
-//                       }
-//                     }
-//                   ]
-//                 }
-//               }
-//             ]
-//           }
-//         }
-//       ]
-//     }
-//   }
-// ]
-```
-
-Note that if you send this document to Notion with the current version of the API it _will_ fail, but this allows you to pre-parse the blocks in your client library, and do something with the tables. In one example, the tables are being parsed out of the blocks, databases being created, that are then linked back to the imported page: https://github.com/infinitaslearning/notionater/blob/main/index.js#L81-L203
-
-## Usage
-
-```ts
-import {markdownToBlocks, markdownToRichText} from '@instantish/martian';
-import type {RichText, Block} from '@notionhq/client/build/src/api-types';
-
-const richText: RichText[] = markdownToRichText(`**Hello _world_**`);
-
-// [
-//   {
-//     "type": "text",
-//     "annotations": {
-//       "bold": true,
-//     },
-//     "text": {
-//       "content": "Hello "
-//     }
-//   },
-//   {
-//     "type": "text",
-//     "annotations": {
-//       "bold": true,
-//       "italic": true,
-//     },
-//     "text": {
-//       "content": "world"
-//     }
-//   }
-// ]
-
-const blocks: Block[] = markdownToBlocks(`
-## this is a _heading 2_
-
-* [x] todo list item
+markdownToBlocks(`
+hello _world_ 
+*** 
+## heading2
+* [x] todo
 `);
-
-// [
-//   {
-//     "object": "block",
-//     "type": "heading_2",
-//     "heading_2": {
-//       "rich_text": [
-//         ...
-//         {
-//           "type": "text",
-//           "annotations": {
-//             "italic": true
-//           }
-//           "text": {
-//             "content": "heading 2"
-//           }
-//         },
-//       ]
-//     }
-//   },
-//   {
-//     "object": "block",
-//     "type": "to_do",
-//     "to_do": {
-//       "rich_text": [
-//         {
-//           "type": "text",
-//           "annotations": {
-//           },
-//           "text": {
-//             "content": "todo list item"
-//           }
-//         }
-//       ],
-//       "checked": true
-//     }
-//   }
-// ]
 ```
+
+<details>
+<summary>Result</summary>
+<pre><code>[
+  {
+    "object": "block",
+    "type": "paragraph",
+    "paragraph": {
+      "rich_text": [
+        {
+          "type": "text",
+          "annotations": {
+            "bold": false,
+            "strikethrough": false,
+            "underline": false,
+            "italic": false,
+            "code": false,
+            "color": "default"
+          },
+          "text": {
+            "content": "hello "
+          }
+        },
+        {
+          "type": "text",
+          "annotations": {
+            "bold": false,
+            "strikethrough": false,
+            "underline": false,
+            "italic": true,
+            "code": false,
+            "color": "default"
+          },
+          "text": {
+            "content": "world"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "object": "block",
+    "type": "heading_2",
+    "heading_2": {
+      "rich_text": [
+        {
+          "type": "text",
+          "annotations": {
+            "bold": false,
+            "strikethrough": false,
+            "underline": false,
+            "italic": false,
+            "code": false,
+            "color": "default"
+          },
+          "text": {
+            "content": "heading2"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "object": "block",
+    "type": "to_do",
+    "to_do": {
+      "rich_text": [
+        {
+          "type": "text",
+          "annotations": {
+            "bold": false,
+            "strikethrough": false,
+            "underline": false,
+            "italic": false,
+            "code": false,
+            "color": "default"
+          },
+          "text": {
+            "content": "todo"
+          }
+        }
+      ],
+      "checked": true
+    }
+  }
+]</code></pre>
+</details>
+
+### Working with Notion's limits
+
+Sometimes a Markdown input would result in an output that would be rejected by the Notion API: here are some options to deal with that.
+
+#### An item exceeds the children or character limit
+
+By default, the package will try to resolve these kind of issues by re-distributing the content to multiple blocks: when that's not possible, `martian` will truncate the output to avoid your request resulting in an error.  
+If you want to disable this kind of behavior, you can use this option:
+
+```ts
+const options = {
+  notionLimits: {
+    truncate: false,
+  },
+};
+
+markdownToBlocks('input', options);
+markdownToRichText('input', options);
+```
+
+#### Manually handling errors related to Notions's limits
+
+You can set a callback for when one of the resulting items would exceed Notion's limits. Please note that this function will be called regardless of whether the final output will be truncated.
+
+```ts
+const options = {
+  notionLimits: {
+    // truncate: true, // by default
+    onError: (err: Error) => {
+      // Something has appened!
+      console.error(err);
+    },
+  },
+};
+
+markdownToBlocks('input', options);
+markdownToRichText('input', options);
+```
+
+### Working with images
+
+If an image as an invalid URL, the Notion API will reject the whole request: `martian` prevents this issue by converting images with invalid links into text, so that request are successfull and you can fix the links later.  
+If you want to disable this kind of behavior, you can use this option:
+
+```ts
+const options = {
+  strictImageUrls: false,
+};
+```
+
+Default behavior:
+
+```ts
+markdownToBlocks('![](InvalidURL)');
+```
+
+<details>
+<summary>Result</summary>
+<pre><code>[
+  {
+    "object": "block",
+    "type": "paragraph",
+    "paragraph": {
+      "rich_text": [
+        {
+          "type": "text",
+          "annotations": {
+            "bold": false,
+            "strikethrough": false,
+            "underline": false,
+            "italic": false,
+            "code": false,
+            "color": "default"
+          },
+          "text": {
+            "content": "InvalidURL"
+          }
+        }
+      ]
+    }
+  }
+]</code></pre>
+</details>
+
+`strictImageUrls` disabled:
+
+```ts
+markdownToBlocks('![](InvalidURL)', {
+  strictImageUrls: false,
+});
+```
+
+<details>
+<summary>Result</summary>
+<pre><code>[
+  {
+    "object": "block",
+    "type": "image",
+    "image": {
+      "type": "external",
+      "external": {
+        "url": "InvalidURL"
+      }
+    }
+  }
+]</code></pre>
+</details>
 
 ---
 
