@@ -273,5 +273,37 @@ const hello = "hello";
       expect(spy).toBeCalledTimes(1);
       expect(spy).toHaveBeenCalledWith(expect.any(Error));
     });
+
+    it('should ignore unsupported elements by default', () => {
+      const text1 = '# Header first\nOther text',
+        text2 = 'Other text\n# Header second';
+
+      const actual1 = markdownToRichText(text1),
+        actual2 = markdownToRichText(text2);
+
+      const expected = [notion.richText('Other text')];
+
+      expect(actual1).toStrictEqual(expected);
+      expect(actual2).toStrictEqual(expected);
+    });
+
+    it("should ignore unsupported elements when nonInline = 'ignore'", () => {
+      const text = '# Header first\nOther text';
+
+      const actual = markdownToRichText(text, {nonInline: 'ignore'});
+
+      const expected = [notion.richText('Other text')];
+
+      expect(actual).toStrictEqual(expected);
+    });
+
+    it("should throw when there's an unsupported element and nonInline = 'throw'", () => {
+      const text = '# Header first\nOther text';
+
+      expect(() => markdownToRichText(text, {nonInline: 'throw'})).toThrow();
+      expect(() =>
+        markdownToRichText(text, {nonInline: 'ignore'})
+      ).not.toThrow();
+    });
   });
 });

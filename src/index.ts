@@ -3,9 +3,9 @@ import markdown from 'remark-parse';
 import type * as notion from './notion';
 import {
   BlocksOptions,
-  CommonOptions,
   parseBlocks,
   parseRichText,
+  RichTextOptions,
 } from './parser/internal';
 import type * as md from './markdown';
 import gfm from 'remark-gfm';
@@ -35,7 +35,7 @@ export function markdownToBlocks(
  */
 export function markdownToRichText(
   text: string,
-  options?: CommonOptions
+  options?: RichTextOptions
 ): notion.RichText[] {
   const root = unified().use(markdown).use(gfm).parse(text);
   return parseRichText(root as unknown as md.Root, options);

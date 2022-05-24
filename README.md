@@ -45,7 +45,8 @@ markdownToRichText(`**Hello _world_**`);
 
 <details>
 <summary>Result</summary>
-<pre><code>[
+<pre>
+[
   {
     "type": "text",
     "annotations": {
@@ -74,7 +75,8 @@ markdownToRichText(`**Hello _world_**`);
       "content": "world"
     }
   }
-]</code></pre>
+]
+</pre>
 </details>
 
 ```ts
@@ -88,7 +90,8 @@ hello _world_
 
 <details>
 <summary>Result</summary>
-<pre><code>[
+<pre>
+[
   {
     "object": "block",
     "type": "paragraph",
@@ -170,7 +173,8 @@ hello _world_
       "checked": true
     }
   }
-]</code></pre>
+]
+</pre>
 </details>
 
 ### Working with Notion's limits
@@ -231,7 +235,8 @@ markdownToBlocks('![](InvalidURL)');
 
 <details>
 <summary>Result</summary>
-<pre><code>[
+<pre>
+[
   {
     "object": "block",
     "type": "paragraph",
@@ -254,7 +259,8 @@ markdownToBlocks('![](InvalidURL)');
       ]
     }
   }
-]</code></pre>
+]
+</pre>
 </details>
 
 `strictImageUrls` disabled:
@@ -267,7 +273,8 @@ markdownToBlocks('![](InvalidURL)', {
 
 <details>
 <summary>Result</summary>
-<pre><code>[
+<pre>
+[
   {
     "object": "block",
     "type": "image",
@@ -278,7 +285,8 @@ markdownToBlocks('![](InvalidURL)', {
       }
     }
   }
-]</code></pre>
+]
+</pre>
 </details>
 
 ---
@@ -286,3 +294,52 @@ markdownToBlocks('![](InvalidURL)', {
 Built with 💙 by the team behind [Fabric](https://tryfabric.com).
 
 <img src="https://static.scarf.sh/a.png?x-pxid=79ae4e0a-7e48-4965-8a83-808c009aa47a" />
+
+### Non-inline elements when parsing rich text
+
+By default, if the text provided to `markdownToRichText` would result in one or more non-inline elements, the package will ignore those and only parse paragraphs.  
+You can make the package throw an error when a non-inline element is detected by setting the `nonInline` option to `'throw'`.
+
+Default behavior:
+
+```ts
+markdownToRichText('# Header\nAbc', {
+  // nonInline: 'ignore', // Default
+});
+```
+
+<details>
+<summary>Result</summary>
+<pre>
+[
+  {
+    type: 'text',
+    annotations: {
+      bold: false,
+      strikethrough: false,
+      underline: false,
+      italic: false,
+      code: false,
+      color: 'default'
+    },
+    text: { content: 'Abc', link: undefined }
+  }
+]
+</pre>
+</details>
+
+Throw an error:
+
+```ts
+markdownToRichText('# Header\nAbc', {
+  nonInline: 'throw',
+});
+```
+
+<details>
+<summary>Result</summary>
+<pre>
+Error: Unsupported markdown element: {"type":"heading","depth":1,"children":[{"type":"text","value":"Header","position":{"start":{"line":1,"column":3,
+"offset":2},"end":{"line":1,"column":9,"offset":8}}}],"position":{"start":{"line":1,"column":1,"offset":0},"end":{"line":1,"column":9,"offset":8}}}  
+</pre>
+</details>
