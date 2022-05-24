@@ -2,7 +2,7 @@
 
 Convert Markdown and GitHub Flavoured Markdown to Notion API Blocks and RichText.
 
-[![Node.js CI](https://github.com/instantish/martian/actions/workflows/ci.yml/badge.svg)](https://github.com/instantish/martian/actions/workflows/ci.yml)
+[![Node.js CI](https://github.com/tryfabric/martian/actions/workflows/ci.yml/badge.svg)](https://github.com/tryfabric/martian/actions/workflows/ci.yml)
 [![Code Style: Google](https://img.shields.io/badge/code%20style-google-blueviolet.svg)](https://github.com/google/gts)
 
 Martian is a Markdown parser to convert any Markdown content to Notion API block or RichText objects. It
@@ -32,9 +32,9 @@ The package exports two functions, which you can import like this:
 
 ```ts
 // JS
-const {markdownToBlocks, markdownToRichText} = require('@instantish/martian');
+const {markdownToBlocks, markdownToRichText} = require('@tryfabric/martian');
 // TS
-import {markdownToBlocks, markdownToRichText} from '@instantish/martian';
+import {markdownToBlocks, markdownToRichText} from '@tryfabric/martian';
 ```
 
 Here are couple of examples with both of them:

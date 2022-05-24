@@ -113,7 +113,7 @@ const hello = "hello";
         notion.headingOne([notion.richText('List')]),
         notion.bulletedListItem(
           [notion.richText('Item 1')],
-          // @ts-expect-error This problem is being addressed in issue #15 (https://github.com/instantish/martian/issues/15)
+          // @ts-expect-error This problem is being addressed in issue #15 (https://github.com/tryfabric/martian/issues/15)
           [notion.bulletedListItem([notion.richText('Sub Item 1')])]
         ),
         notion.bulletedListItem([notion.richText('Item 2')]),
