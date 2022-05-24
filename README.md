@@ -45,7 +45,8 @@ markdownToRichText(`**Hello _world_**`);
 
 <details>
 <summary>Result</summary>
-<pre><code>[
+<pre>
+[
   {
     "type": "text",
     "annotations": {
@@ -74,7 +75,8 @@ markdownToRichText(`**Hello _world_**`);
       "content": "world"
     }
   }
-]</code></pre>
+]
+</pre>
 </details>
 
 ```ts
@@ -88,7 +90,8 @@ hello _world_
 
 <details>
 <summary>Result</summary>
-<pre><code>[
+<pre>
+[
   {
     "object": "block",
     "type": "paragraph",
@@ -170,7 +173,8 @@ hello _world_
       "checked": true
     }
   }
-]</code></pre>
+]
+</pre>
 </details>
 
 ### Working with Notion's limits
@@ -231,7 +235,8 @@ markdownToBlocks('![](InvalidURL)');
 
 <details>
 <summary>Result</summary>
-<pre><code>[
+<pre>
+[
   {
     "object": "block",
     "type": "paragraph",
@@ -254,7 +259,8 @@ markdownToBlocks('![](InvalidURL)');
       ]
     }
   }
-]</code></pre>
+]
+</pre>
 </details>
 
 `strictImageUrls` disabled:
@@ -267,7 +273,8 @@ markdownToBlocks('![](InvalidURL)', {
 
 <details>
 <summary>Result</summary>
-<pre><code>[
+<pre>
+[
   {
     "object": "block",
     "type": "image",
@@ -278,7 +285,8 @@ markdownToBlocks('![](InvalidURL)', {
       }
     }
   }
-]</code></pre>
+]
+</pre>
 </details>
 
 ---
