@@ -122,18 +122,9 @@ const hello = "hello";
       expect(actual).toStrictEqual(expected);
     });
 
-    it('should skip tables if unsupported = false', () => {
+    it('should deal with tables', () => {
       const text = fs.readFileSync('test/fixtures/table.md').toString();
-      const actual = markdownToBlocks(text, {
-        allowUnsupported: false,
-      });
-      const expected = [notion.headingOne([notion.richText('Table')])];
-      expect(actual).toStrictEqual(expected);
-    });
-
-    it('should include tables if unsupported = true', () => {
-      const text = fs.readFileSync('test/fixtures/table.md').toString();
-      const actual = markdownToBlocks(text, {allowUnsupported: true});
+      const actual = markdownToBlocks(text);
       const expected = [
         notion.headingOne([notion.richText('Table')]),
         notion.table(
@@ -155,7 +146,7 @@ const hello = "hello";
         ),
       ];
 
-      expect(expected).toStrictEqual(actual);
+      expect(actual).toStrictEqual(expected);
     });
 
     it('should convert markdown to blocks - deal with images - strict mode', () => {
@@ -173,7 +164,7 @@ const hello = "hello";
         notion.paragraph([notion.richText('https://image.com/blah')]),
       ];
 
-      expect(expected).toStrictEqual(actual);
+      expect(actual).toStrictEqual(expected);
     });
 
     it('should convert markdown to blocks - deal with images - not strict mode', () => {
