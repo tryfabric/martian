@@ -14,11 +14,11 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Set up Node.js for NPM
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           registry-url: 'https://registry.npmjs.org'
 
-      - run: npm install
+      - run: npm ci
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -31,11 +31,11 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Set up Node.js for GPR
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           registry-url: 'https://npm.pkg.github.com/'
 
-      - run: npm install
+      - run: npm ci
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
