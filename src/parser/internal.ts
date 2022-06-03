@@ -2,17 +2,19 @@ import * as md from '../markdown';
 import * as notion from '../notion';
 import path from 'path';
 import {URL} from 'url';
-import {isSupportedCodeLang, LIMITS} from '../notion';
+
+const nbuild = notion.Builders,
+  {LIMITS} = notion;
 
 function ensureLength(text: string, copy?: object) {
   const chunks = text.match(/[^]{1,2000}/g) || [];
-  return chunks.flatMap((item: string) => notion.richText(item, copy));
+  return chunks.flatMap((item: string) => notion.Builders.richText(item, copy));
 }
 
 function ensureCodeBlockLanguage(lang?: string) {
   if (lang) {
     lang = lang.toLowerCase();
-    return isSupportedCodeLang(lang) ? lang : notion.parseCodeLanguage(lang);
+    return notion.isCodeLang(lang) ? lang : notion.parseCodeLanguage(lang);
   }
 
   return undefined;
@@ -20,7 +22,7 @@ function ensureCodeBlockLanguage(lang?: string) {
 
 function parseInline(
   element: md.PhrasingContent,
-  options?: notion.RichTextOptions
+  options?: notion.Builders.RichTextOptions
 ): notion.RichText[] {
   const copy = {
     annotations: {
@@ -51,17 +53,17 @@ function parseInline(
 
     case 'inlineCode':
       copy.annotations.code = true;
-      return [notion.richText(element.value, copy)];
+      return nbuild.richText(element.value, copy);
 
     case 'inlineMath':
-      return [notion.richText(element.value, {...copy, type: 'equation'})];
+      return nbuild.richText(element.value, {...copy, type: 'equation'});
 
     default:
       return [];
   }
 }
 
-function parseImage(image: md.Image, options: BlocksOptions): notion.Block {
+function parseImage(image: md.Image, options: BlocksOptions) {
   // https://developers.notion.com/reference/block#image-blocks
   const allowedTypes = [
     '.png',
@@ -76,7 +78,7 @@ function parseImage(image: md.Image, options: BlocksOptions): notion.Block {
   ];
 
   function dealWithError() {
-    return notion.paragraph([notion.richText(image.url)]);
+    return nbuild.paragraph(nbuild.richText(image.url));
   }
 
   try {
@@ -84,12 +86,12 @@ function parseImage(image: md.Image, options: BlocksOptions): notion.Block {
       const parsedUrl = new URL(image.url);
       const fileType = path.extname(parsedUrl.pathname);
       if (allowedTypes.includes(fileType)) {
-        return notion.image(image.url);
+        return nbuild.image(image.url);
       } else {
         return dealWithError();
       }
     } else {
-      return notion.image(image.url);
+      return nbuild.image(image.url);
     }
   } catch (error: unknown) {
     return dealWithError();
@@ -110,7 +112,7 @@ function parseParagraph(
     const emphasisItem = element.children[1] as md.Emphasis;
     const emphasisTextItem = emphasisItem.children[0] as md.Text;
     if (emphasisTextItem.value === 'TOC') {
-      return [notion.table_of_contents()];
+      return [nbuild.tableOfContents()];
     }
   }
 
@@ -130,7 +132,7 @@ function parseParagraph(
   });
 
   if (paragraphs.length) {
-    return [notion.paragraph(paragraphs.flat()), ...images];
+    return [nbuild.paragraph(paragraphs.flat()), ...images];
   } else {
     return images;
   }
@@ -141,7 +143,7 @@ function parseBlockquote(
   options: BlocksOptions
 ): notion.Block {
   const children = element.children.flatMap(child => parseNode(child, options));
-  return notion.blockquote([], children);
+  return nbuild.quote([], children);
 }
 
 function parseHeading(element: md.Heading): notion.Block {
@@ -149,20 +151,20 @@ function parseHeading(element: md.Heading): notion.Block {
 
   switch (element.depth) {
     case 1:
-      return notion.headingOne(text);
+      return nbuild.headingOne(text);
 
     case 2:
-      return notion.headingTwo(text);
+      return nbuild.headingTwo(text);
 
     default:
-      return notion.headingThree(text);
+      return nbuild.headingThree(text);
   }
 }
 
 function parseCode(element: md.Code): notion.Block {
   const text = ensureLength(element.value);
   const lang = ensureCodeBlockLanguage(element.lang);
-  return notion.code(text, lang);
+  return nbuild.code(text, lang);
 }
 
 function parseList(element: md.List, options: BlocksOptions): notion.Block[] {
@@ -175,17 +177,16 @@ function parseList(element: md.List, options: BlocksOptions): notion.Block[] {
     const text = paragraph.children.flatMap(child => parseInline(child));
 
     // Now process any of the children
-    const parsedChildren: notion.BlockWithoutChildren[] = item.children.flatMap(
-      child =>
-        parseNode(child, options) as unknown as notion.BlockWithoutChildren
+    const parsedChildren = item.children.flatMap(child =>
+      parseNode(child, options)
     );
 
     if (element.start !== null && element.start !== undefined) {
-      return [notion.numberedListItem(text, parsedChildren)];
+      return [nbuild.numberedListItem(text, parsedChildren)];
     } else if (item.checked !== null && item.checked !== undefined) {
-      return [notion.toDo(item.checked, text, parsedChildren)];
+      return [nbuild.toDo(item.checked, text, parsedChildren)];
     } else {
-      return [notion.bulletedListItem(text, parsedChildren)];
+      return [nbuild.bulletedListItem(text, parsedChildren)];
     }
   });
 }
@@ -194,9 +195,11 @@ function parseTableCell(node: md.TableCell): notion.RichText[][] {
   return [node.children.flatMap(child => parseInline(child))];
 }
 
-function parseTableRow(node: md.TableRow): notion.BlockWithoutChildren[] {
+function parseTableRow(
+  node: md.TableRow
+): notion.NotionRequest.Blocks.TableRow[] {
   const tableCells = node.children.flatMap(child => parseTableCell(child));
-  return [notion.tableRow(tableCells)];
+  return [nbuild.tableRow(tableCells)];
 }
 
 function parseTable(node: md.Table): notion.Block[] {
@@ -206,12 +209,12 @@ function parseTable(node: md.Table): notion.Block[] {
     : 0;
 
   const tableRows = node.children.flatMap(child => parseTableRow(child));
-  return [notion.table(tableRows, tableWidth)];
+  return [nbuild.table(tableRows, tableWidth)];
 }
 
 function parseMath(node: md.Math): notion.Block {
   const textWithKatexNewlines = node.value.split('\n').join('\\\\\n');
-  return notion.equation(textWithKatexNewlines);
+  return nbuild.equation(textWithKatexNewlines);
 }
 
 function parseNode(

@@ -4,12 +4,9 @@
 import l, {Language} from 'linguist-languages';
 import fs from 'fs';
 import path from 'path';
-import {supportedCodeLang} from '../src/notion';
+import {CodeLang} from '../src/notion';
 
-export const languages: Record<
-  supportedCodeLang,
-  Language | Language[] | undefined
-> = {
+const languages: Record<CodeLang, Language | Language[] | undefined> = {
   abap: l.ABAP,
   arduino: undefined, // Handled as C++
   bash: l.Shell,

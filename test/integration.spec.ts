@@ -1,5 +1,5 @@
 import {markdownToBlocks, markdownToRichText} from '../src';
-import * as notion from '../src/notion';
+import {Builders as notion} from '../src/notion';
 import fs from 'fs';
 import {LIMITS} from '../src/notion';
 
@@ -16,11 +16,11 @@ hello _world_
 
       const expected = [
         notion.paragraph([
-          notion.richText('hello '),
-          notion.richText('world', {annotations: {italic: true}}),
+          ...notion.richText('hello '),
+          ...notion.richText('world', {annotations: {italic: true}}),
         ]),
-        notion.headingTwo([notion.richText('heading2')]),
-        notion.toDo(true, [notion.richText('todo')]),
+        notion.headingTwo(notion.richText('heading2')),
+        notion.toDo(true, notion.richText('todo'), []),
       ];
 
       expect(actual).toStrictEqual(expected);
@@ -36,8 +36,8 @@ const hello = "hello";
       const actual = markdownToBlocks(text);
 
       const expected = [
-        notion.headingTwo([notion.richText('Code')]),
-        notion.code([notion.richText('const hello = "hello";')], 'plain text'),
+        notion.headingTwo(notion.richText('Code')),
+        notion.code(notion.richText('const hello = "hello";'), 'plain text'),
       ];
 
       expect(actual).toStrictEqual(expected);
@@ -53,8 +53,8 @@ const hello = "hello";
       const actual = markdownToBlocks(text);
 
       const expected = [
-        notion.headingTwo([notion.richText('Code')]),
-        notion.code([notion.richText('const hello = "hello";')], 'webassembly'),
+        notion.headingTwo(notion.richText('Code')),
+        notion.code(notion.richText('const hello = "hello";'), 'webassembly'),
       ];
 
       expect(actual).toStrictEqual(expected);
@@ -70,8 +70,8 @@ const hello = "hello";
       const actual = markdownToBlocks(text);
 
       const expected = [
-        notion.headingTwo([notion.richText('Code')]),
-        notion.code([notion.richText('const hello = "hello";')], 'typescript'),
+        notion.headingTwo(notion.richText('Code')),
+        notion.code(notion.richText('const hello = "hello";'), 'typescript'),
       ];
 
       expect(actual).toStrictEqual(expected);
@@ -82,12 +82,12 @@ const hello = "hello";
       const actual = markdownToBlocks(text);
 
       const expected = [
-        notion.headingOne([notion.richText('Images')]),
-        notion.paragraph([notion.richText('This is a paragraph!')]),
-        notion.blockquote([], [notion.paragraph([notion.richText('Quote')])]),
-        notion.paragraph([notion.richText('Paragraph')]),
+        notion.headingOne(notion.richText('Images')),
+        notion.paragraph(notion.richText('This is a paragraph!')),
+        notion.quote([], [notion.paragraph(notion.richText('Quote'))]),
+        notion.paragraph(notion.richText('Paragraph')),
         notion.image('https://url.com/image.jpg'),
-        notion.table_of_contents(),
+        notion.tableOfContents(),
       ];
 
       expect(actual).toStrictEqual(expected);
@@ -110,13 +110,11 @@ const hello = "hello";
       const actual = markdownToBlocks(text);
 
       const expected = [
-        notion.headingOne([notion.richText('List')]),
-        notion.bulletedListItem(
-          [notion.richText('Item 1')],
-          // @ts-expect-error This problem is being addressed in issue #15 (https://github.com/tryfabric/martian/issues/15)
-          [notion.bulletedListItem([notion.richText('Sub Item 1')])]
-        ),
-        notion.bulletedListItem([notion.richText('Item 2')]),
+        notion.headingOne(notion.richText('List')),
+        notion.bulletedListItem(notion.richText('Item 1'), [
+          notion.bulletedListItem(notion.richText('Sub Item 1'), []),
+        ]),
+        notion.bulletedListItem(notion.richText('Item 2'), []),
       ];
 
       expect(actual).toStrictEqual(expected);
@@ -126,20 +124,20 @@ const hello = "hello";
       const text = fs.readFileSync('test/fixtures/table.md').toString();
       const actual = markdownToBlocks(text);
       const expected = [
-        notion.headingOne([notion.richText('Table')]),
+        notion.headingOne(notion.richText('Table')),
         notion.table(
           [
             notion.tableRow([
-              [notion.richText('First Header')],
-              [notion.richText('Second Header')],
+              notion.richText('First Header'),
+              notion.richText('Second Header'),
             ]),
             notion.tableRow([
-              [notion.richText('Content Cell')],
-              [notion.richText('Content Cell')],
+              notion.richText('Content Cell'),
+              notion.richText('Content Cell'),
             ]),
             notion.tableRow([
-              [notion.richText('Content Cell')],
-              [notion.richText('Content Cell')],
+              notion.richText('Content Cell'),
+              notion.richText('Content Cell'),
             ]),
           ],
           2
@@ -154,14 +152,14 @@ const hello = "hello";
       const actual = markdownToBlocks(text, {strictImageUrls: true});
 
       const expected = [
-        notion.headingOne([notion.richText('Images')]),
+        notion.headingOne(notion.richText('Images')),
         notion.paragraph([
-          notion.richText('This is an image in a paragraph '),
-          notion.richText(', which isnt supported in Notion.'),
+          ...notion.richText('This is an image in a paragraph '),
+          ...notion.richText(', which isnt supported in Notion.'),
         ]),
         notion.image('https://image.com/url.jpg'),
         notion.image('https://image.com/paragraph.jpg'),
-        notion.paragraph([notion.richText('https://image.com/blah')]),
+        notion.paragraph(notion.richText('https://image.com/blah')),
       ];
 
       expect(actual).toStrictEqual(expected);
@@ -172,10 +170,10 @@ const hello = "hello";
       const actual = markdownToBlocks(text, {strictImageUrls: false});
 
       const expected = [
-        notion.headingOne([notion.richText('Images')]),
+        notion.headingOne(notion.richText('Images')),
         notion.paragraph([
-          notion.richText('This is an image in a paragraph '),
-          notion.richText(', which isnt supported in Notion.'),
+          ...notion.richText('This is an image in a paragraph '),
+          ...notion.richText(', which isnt supported in Notion.'),
         ]),
         notion.image('https://image.com/url.jpg'),
         notion.image('https://image.com/paragraph.jpg'),
@@ -191,11 +189,11 @@ const hello = "hello";
 
       const expected = [
         notion.paragraph([
-          notion.richText('Lift('),
-          notion.richText('L', {type: 'equation'}),
-          notion.richText(') can be determined by Lift Coefficient ('),
-          notion.richText('C_L', {type: 'equation'}),
-          notion.richText(') like the following\nequation.'),
+          ...notion.richText('Lift('),
+          ...notion.richText('L', {type: 'equation'}),
+          ...notion.richText(') can be determined by Lift Coefficient ('),
+          ...notion.richText('C_L', {type: 'equation'}),
+          ...notion.richText(') like the following\nequation.'),
         ]),
         notion.equation('L = \\frac{1}{2} \\rho v^2 S C_L\\\\\ntest'),
       ];
@@ -210,8 +208,8 @@ const hello = "hello";
       const actual = markdownToRichText(text);
 
       const expected = [
-        notion.richText('hello '),
-        notion.richText('url', {
+        ...notion.richText('hello '),
+        ...notion.richText('url', {
           annotations: {italic: true},
           url: 'https://example.com',
         }),
@@ -225,8 +223,8 @@ const hello = "hello";
       const actual = markdownToRichText(text);
 
       const expected = [
-        notion.richText('hello'),
-        notion.richText('url', {
+        ...notion.richText('hello'),
+        ...notion.richText('url', {
           url: 'http://google.com',
         }),
       ];
@@ -281,7 +279,7 @@ const hello = "hello";
       const actual1 = markdownToRichText(text1),
         actual2 = markdownToRichText(text2);
 
-      const expected = [notion.richText('Other text')];
+      const expected = notion.richText('Other text');
 
       expect(actual1).toStrictEqual(expected);
       expect(actual2).toStrictEqual(expected);
@@ -292,7 +290,7 @@ const hello = "hello";
 
       const actual = markdownToRichText(text, {nonInline: 'ignore'});
 
-      const expected = [notion.richText('Other text')];
+      const expected = notion.richText('Other text');
 
       expect(actual).toStrictEqual(expected);
     });

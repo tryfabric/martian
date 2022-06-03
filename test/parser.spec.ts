@@ -1,6 +1,6 @@
 import * as md from '../src/markdown';
 import {text} from '../src/markdown';
-import * as notion from '../src/notion';
+import {Builders as notion} from '../src/notion';
 import {parseBlocks, parseRichText} from '../src/parser/internal';
 
 describe('gfm parser', () => {
@@ -19,15 +19,15 @@ describe('gfm parser', () => {
 
     const expected = [
       notion.paragraph([
-        notion.richText('Hello '),
-        notion.richText('world ', {
+        ...notion.richText('Hello '),
+        ...notion.richText('world ', {
           annotations: {italic: true},
         }),
-        notion.richText('foo', {
+        ...notion.richText('foo', {
           annotations: {italic: true, bold: true},
         }),
-        notion.richText('! '),
-        notion.richText('code', {
+        ...notion.richText('! '),
+        ...notion.richText('code', {
           annotations: {code: true},
         }),
       ]),
@@ -53,15 +53,15 @@ describe('gfm parser', () => {
 
     const expected = [
       notion.paragraph([
-        notion.richText('hello world '),
-        notion.richText('this is a ', {
+        ...notion.richText('hello world '),
+        ...notion.richText('this is a ', {
           url: 'https://example.com',
         }),
-        notion.richText('url', {
+        ...notion.richText('url', {
           annotations: {italic: true},
           url: 'https://example.com',
         }),
-        notion.richText(' end'),
+        ...notion.richText(' end'),
       ]),
     ];
 
@@ -78,8 +78,8 @@ describe('gfm parser', () => {
     const actual = parseBlocks(ast, options);
 
     const expected = [
-      notion.paragraph([notion.richText('hello')]),
-      notion.paragraph([notion.richText('world')]),
+      notion.paragraph(notion.richText('hello')),
+      notion.paragraph(notion.richText('world')),
     ];
 
     expect(actual).toStrictEqual(expected);
@@ -96,10 +96,10 @@ describe('gfm parser', () => {
     const actual = parseBlocks(ast, options);
 
     const expected = [
-      notion.headingOne([notion.richText('heading1')]),
-      notion.headingTwo([notion.richText('heading2')]),
-      notion.headingThree([notion.richText('heading3')]),
-      notion.headingThree([notion.richText('heading4')]),
+      notion.headingOne(notion.richText('heading1')),
+      notion.headingTwo(notion.richText('heading2')),
+      notion.headingThree(notion.richText('heading3')),
+      notion.headingThree(notion.richText('heading4')),
     ];
 
     expect(actual).toStrictEqual(expected);
@@ -114,8 +114,8 @@ describe('gfm parser', () => {
     const actual = parseBlocks(ast);
 
     const expected = [
-      notion.paragraph([notion.richText('hello')]),
-      notion.code([notion.richText('const foo = () => {}')], 'plain text'),
+      notion.paragraph(notion.richText('hello')),
+      notion.code(notion.richText('const foo = () => {}'), 'plain text'),
     ];
     expect(actual).toStrictEqual(expected);
   });
@@ -129,8 +129,8 @@ describe('gfm parser', () => {
     const actual = parseBlocks(ast, options);
 
     const expected = [
-      notion.paragraph([notion.richText('hello')]),
-      notion.code([notion.richText('public class Foo {}')], 'java'),
+      notion.paragraph(notion.richText('hello')),
+      notion.code(notion.richText('public class Foo {}'), 'java'),
     ];
 
     expect(actual).toStrictEqual(expected);
@@ -145,8 +145,8 @@ describe('gfm parser', () => {
     const actual = parseBlocks(ast);
 
     const expected = [
-      notion.paragraph([notion.richText('hello')]),
-      notion.code([notion.richText('const foo = () => {}')], 'plain text'),
+      notion.paragraph(notion.richText('hello')),
+      notion.code(notion.richText('const foo = () => {}'), 'plain text'),
     ];
 
     expect(actual).toStrictEqual(expected);
@@ -162,12 +162,12 @@ describe('gfm parser', () => {
     const actual = parseBlocks(ast, options);
 
     const expected = [
-      notion.blockquote(
+      notion.quote(
         [],
         [
           notion.headingOne([
-            notion.richText('hello'),
-            notion.richText('world', {
+            ...notion.richText('hello'),
+            ...notion.richText('world', {
               annotations: {italic: true},
             }),
           ]),
@@ -192,15 +192,17 @@ describe('gfm parser', () => {
     const actual = parseBlocks(ast, options);
 
     const expected = [
-      notion.paragraph([notion.richText('hello')]),
-      notion.bulletedListItem([notion.richText('a')]),
-      notion.bulletedListItem([
+      notion.paragraph(notion.richText('hello')),
+      notion.bulletedListItem(notion.richText('a'), []),
+      notion.bulletedListItem(
         notion.richText('b', {annotations: {italic: true}}),
-      ]),
-      notion.bulletedListItem([
+        []
+      ),
+      notion.bulletedListItem(
         notion.richText('c', {annotations: {bold: true}}),
-      ]),
-      notion.numberedListItem([notion.richText('d')]),
+        []
+      ),
+      notion.numberedListItem(notion.richText('d'), []),
     ];
 
     expect(actual).toStrictEqual(expected);
@@ -229,29 +231,29 @@ describe('gfm parser', () => {
     const actual = parseBlocks(ast, options);
 
     const expected = [
-      notion.paragraph([
+      notion.paragraph(
         notion.richText('https://example.com', {
           url: 'https://example.com',
-        }),
-      ]),
-      notion.paragraph([
+        })
+      ),
+      notion.paragraph(
         notion.richText('strikethrough content', {
           annotations: {strikethrough: true},
-        }),
-      ]),
+        })
+      ),
       notion.table(
         [
           notion.tableRow([
-            [notion.richText('a')],
-            [notion.richText('b')],
-            [notion.richText('c')],
-            [notion.richText('d')],
+            notion.richText('a'),
+            notion.richText('b'),
+            notion.richText('c'),
+            notion.richText('d'),
           ]),
         ],
         4
       ),
-      notion.toDo(false, [notion.richText('to do')]),
-      notion.toDo(true, [notion.richText('done')]),
+      notion.toDo(false, notion.richText('to do'), []),
+      notion.toDo(true, notion.richText('done'), []),
     ];
 
     expect(actual).toStrictEqual(expected);
@@ -269,10 +271,10 @@ describe('gfm parser', () => {
     const actual = parseRichText(ast);
 
     const expected = [
-      notion.richText('a'),
-      notion.richText('b', {annotations: {italic: true, bold: true}}),
-      notion.richText('c', {annotations: {bold: true}}),
-      notion.richText('d', {url: 'https://example.com'}),
+      ...notion.richText('a'),
+      ...notion.richText('b', {annotations: {italic: true, bold: true}}),
+      ...notion.richText('c', {annotations: {bold: true}}),
+      ...notion.richText('d', {url: 'https://example.com'}),
     ];
 
     expect(actual).toStrictEqual(expected);

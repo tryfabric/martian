@@ -1,13 +1,20 @@
-import {supportedCodeLang} from './common';
+import {
+  CodeLang,
+  Constants,
+  isCodeLang,
+  NotionRequest,
+} from '@tryfabric/notion-utils';
 import lm from './languageMap.json';
 
-export * from './blocks';
-export * from './common';
+export * from '@tryfabric/notion-utils';
+export const {LIMITS} = Constants;
+export type Block = NotionRequest.Block;
+export type RichText = NotionRequest.RichText;
 
-export function parseCodeLanguage(
-  lang?: string
-): supportedCodeLang | undefined {
+export function parseCodeLanguage(lang?: string): CodeLang | undefined {
   return lang
-    ? (lm as Record<string, supportedCodeLang>)[lang.toLowerCase()]
+    ? isCodeLang(lang)
+      ? lang
+      : (lm as Record<string, CodeLang>)[lang.toLowerCase()]
     : undefined;
 }
