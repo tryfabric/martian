@@ -289,12 +289,6 @@ markdownToBlocks('![](InvalidURL)', {
 </pre>
 </details>
 
----
-
-Built with 💙 by the team behind [Fabric](https://tryfabric.com).
-
-<img src="https://static.scarf.sh/a.png?x-pxid=79ae4e0a-7e48-4965-8a83-808c009aa47a" />
-
 ### Non-inline elements when parsing rich text
 
 By default, if the text provided to `markdownToRichText` would result in one or more non-inline elements, the package will ignore those and only parse paragraphs.  
@@ -343,3 +337,12 @@ Error: Unsupported markdown element: {"type":"heading","depth":1,"children":[{"t
 "offset":2},"end":{"line":1,"column":9,"offset":8}}}],"position":{"start":{"line":1,"column":1,"offset":0},"end":{"line":1,"column":9,"offset":8}}}  
 </pre>
 </details>
+
+
+
+---
+
+Built with 💙 by the team behind [Fabric](https://tryfabric.com).
+
+<img src="https://static.scarf.sh/a.png?x-pxid=79ae4e0a-7e48-4965-8a83-808c009aa47a" />
+
