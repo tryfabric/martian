@@ -27,6 +27,15 @@ export interface RichTextOptions {
   url?: string;
 }
 
+function isValidURL(url: string | undefined): boolean {
+  if (!url || url === '') {
+    return false;
+  }
+
+  const urlRegex = /^https?:\/\/.+/i;
+  return urlRegex.test(url);
+}
+
 export function richText(
   content: string,
   options: RichTextOptions = {}
@@ -55,7 +64,7 @@ export function richText(
       annotations,
       text: {
         content: content,
-        link: options.url
+        link: isValidURL(options.url)
           ? {
               type: 'url',
               url: options.url,

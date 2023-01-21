@@ -220,6 +220,19 @@ const hello = "hello";
       expect(actual).toStrictEqual(expected);
     });
 
+    it('should convert markdown with invalid link like "#title2" to rich text', () => {
+      const text = 'hello [url](#head)';
+      const actual = markdownToRichText(text);
+
+      const expected = [
+        notion.richText('hello '),
+        notion.richText('url', {
+          url: '#head',
+        }),
+      ];
+      expect(actual).toStrictEqual(expected);
+    });
+
     it('should convert markdown with multiple newlines to rich text', () => {
       const text = 'hello\n\n[url](http://google.com)';
       const actual = markdownToRichText(text);
