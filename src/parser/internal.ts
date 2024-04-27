@@ -73,6 +73,7 @@ function parseImage(image: md.Image, options: BlocksOptions): notion.Block {
     '.bmp',
     '.svg',
     '.heic',
+    '.webp',
   ];
 
   function dealWithError() {
