@@ -92,6 +92,21 @@ const hello = "hello";
 
       expect(actual).toStrictEqual(expected);
     });
+    
+    it('should deal with divider', () => {
+      const text = fs.readFileSync('test/fixtures/divider.md').toString();
+      const actual = markdownToBlocks(text);
+
+      const expected = [
+        notion.paragraph([notion.richText('Thematic Break')]),
+        notion.divider(),
+        notion.paragraph([notion.richText('Divider')]),
+        notion.divider(),
+        notion.paragraph([notion.richText('END')]),
+      ];
+
+      expect(actual).toStrictEqual(expected);
+    });
 
     it('should break up large elements', () => {
       const text = fs.readFileSync('test/fixtures/large-item.md').toString();
