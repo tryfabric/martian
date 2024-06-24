@@ -1,8 +1,8 @@
 {
-  "name": "@tryfabric/martian",
-  "version": "1.2.4",
+  "name": "@prius.ai/martian",
+  "version": "1.2.5",
   "description": "Converts Markdown to Notion Blocks and RichText",
-  "repository": "https://github.com/tryfabric/martian",
+  "repository": "https://github.com/PriusAI/martian",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "scripts": {
@@ -29,6 +29,7 @@
   "license": "ISC",
   "dependencies": {
     "@notionhq/client": "^1.0.4",
+    "@types/unist": "^3.0.2",
     "remark-gfm": "^1.0.0",
     "remark-math": "^4.0.0",
     "remark-parse": "^9.0.0",
