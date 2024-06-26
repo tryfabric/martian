@@ -19,6 +19,7 @@ hello _world_
           notion.richText('hello '),
           notion.richText('world', {annotations: {italic: true}}),
         ]),
+        notion.divider(),
         notion.headingTwo([notion.richText('heading2')]),
         notion.toDo(true, [notion.richText('todo')]),
       ];
@@ -92,7 +93,7 @@ const hello = "hello";
 
       expect(actual).toStrictEqual(expected);
     });
-    
+
     it('should deal with divider', () => {
       const text = fs.readFileSync('test/fixtures/divider.md').toString();
       const actual = markdownToBlocks(text);
