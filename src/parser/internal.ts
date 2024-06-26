@@ -241,6 +241,9 @@ function parseNode(
     case 'math':
       return [parseMath(node)];
 
+    case 'thematicBreak':
+      return [notion.divider()];
+
     default:
       return [];
   }

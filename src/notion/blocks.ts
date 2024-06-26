@@ -12,6 +12,14 @@ export type RichText = (Block & {
   type: 'paragraph';
 })['paragraph']['rich_text'][number];
 
+export function divider(): Block {
+  return {
+    object: 'block',
+    type: 'divider',
+    divider: {},
+  };
+}
+
 export function paragraph(text: RichText[]): Block {
   return {
     object: 'block',

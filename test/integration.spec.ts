@@ -19,6 +19,7 @@ hello _world_
           notion.richText('hello '),
           notion.richText('world', {annotations: {italic: true}}),
         ]),
+        notion.divider(),
         notion.headingTwo([notion.richText('heading2')]),
         notion.toDo(true, [notion.richText('todo')]),
       ];
@@ -88,6 +89,21 @@ const hello = "hello";
         notion.paragraph([notion.richText('Paragraph')]),
         notion.image('https://url.com/image.jpg'),
         notion.table_of_contents(),
+      ];
+
+      expect(actual).toStrictEqual(expected);
+    });
+
+    it('should deal with divider', () => {
+      const text = fs.readFileSync('test/fixtures/divider.md').toString();
+      const actual = markdownToBlocks(text);
+
+      const expected = [
+        notion.paragraph([notion.richText('Thematic Break')]),
+        notion.divider(),
+        notion.paragraph([notion.richText('Divider')]),
+        notion.divider(),
+        notion.paragraph([notion.richText('END')]),
       ];
 
       expect(actual).toStrictEqual(expected);

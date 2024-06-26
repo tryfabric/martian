@@ -79,6 +79,7 @@ describe('gfm parser', () => {
 
     const expected = [
       notion.paragraph([notion.richText('hello')]),
+      notion.divider(),
       notion.paragraph([notion.richText('world')]),
     ];
 
