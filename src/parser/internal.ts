@@ -122,6 +122,9 @@ function parseParagraph(
   element.children.forEach(item => {
     if (item.type === 'image') {
       images.push(parseImage(item, options));
+    } else if (item.type === 'link' && item.children.length === 1 && item.children[0].type === 'image') {
+      const imageNode = item.children[0];
+      images.push(parseImage(imageNode, options));
     } else {
       const richText = parseInline(item) as notion.RichText[];
       if (richText.length) {
