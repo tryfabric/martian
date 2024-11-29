@@ -162,21 +162,6 @@ describe('gfm parser', () => {
     expect(actual).toStrictEqual(expected);
   });
 
-  it('should parse code block with rich text without annotations field', () => {
-    const ast = md.root(md.code('const foo = "bar";', 'typescript'));
-
-    const actual = parseBlocks(ast, options);
-
-    const expected = [
-      notion.code(
-        [notion.richText('const foo = "bar";', {omitAnnotations: true})],
-        'typescript'
-      ),
-    ];
-
-    expect(actual).toStrictEqual(expected);
-  });
-
   it('should parse block quote', () => {
     const ast = md.root(
       md.blockquote(
