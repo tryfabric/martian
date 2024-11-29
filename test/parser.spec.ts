@@ -117,14 +117,7 @@ describe('gfm parser', () => {
     const expected = [
       notion.paragraph([notion.richText('hello')]),
       notion.code(
-        [
-          {
-            type: 'text',
-            text: {
-              content: 'const foo = () => {}',
-            },
-          } as notion.RichText,
-        ],
+        [notion.richText('const foo = () => {}', {omitAnnotations: true})],
         'plain text'
       ),
     ];
@@ -142,14 +135,7 @@ describe('gfm parser', () => {
     const expected = [
       notion.paragraph([notion.richText('hello')]),
       notion.code(
-        [
-          {
-            type: 'text',
-            text: {
-              content: 'public class Foo {}',
-            },
-          } as notion.RichText,
-        ],
+        [notion.richText('public class Foo {}', {omitAnnotations: true})],
         'java'
       ),
     ];
@@ -168,14 +154,7 @@ describe('gfm parser', () => {
     const expected = [
       notion.paragraph([notion.richText('hello')]),
       notion.code(
-        [
-          {
-            type: 'text',
-            text: {
-              content: 'const foo = () => {}',
-            },
-          } as notion.RichText,
-        ],
+        [notion.richText('const foo = () => {}', {omitAnnotations: true})],
         'plain text'
       ),
     ];
@@ -190,14 +169,7 @@ describe('gfm parser', () => {
 
     const expected = [
       notion.code(
-        [
-          {
-            type: 'text',
-            text: {
-              content: 'const foo = "bar";',
-            },
-          } as notion.RichText,
-        ],
+        [notion.richText('const foo = "bar";', {omitAnnotations: true})],
         'typescript'
       ),
     ];

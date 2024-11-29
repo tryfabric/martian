@@ -39,14 +39,7 @@ const hello = "hello";
       const expected = [
         notion.headingTwo([notion.richText('Code')]),
         notion.code(
-          [
-            {
-              type: 'text',
-              text: {
-                content: 'const hello = "hello";',
-              },
-            } as notion.RichText,
-          ],
+          [notion.richText('const hello = "hello";', {omitAnnotations: true})],
           'plain text'
         ),
       ];
@@ -66,14 +59,7 @@ const hello = "hello";
       const expected = [
         notion.headingTwo([notion.richText('Code')]),
         notion.code(
-          [
-            {
-              type: 'text',
-              text: {
-                content: 'const hello = "hello";',
-              },
-            } as notion.RichText,
-          ],
+          [notion.richText('const hello = "hello";', {omitAnnotations: true})],
           'webassembly'
         ),
       ];
@@ -93,14 +79,7 @@ const hello = "hello";
       const expected = [
         notion.headingTwo([notion.richText('Code')]),
         notion.code(
-          [
-            {
-              type: 'text',
-              text: {
-                content: 'const hello = "hello";',
-              },
-            } as notion.RichText,
-          ],
+          [notion.richText('const hello = "hello";', {omitAnnotations: true})],
           'typescript'
         ),
       ];

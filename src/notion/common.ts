@@ -25,6 +25,7 @@ export interface RichTextOptions {
     color?: string;
   };
   url?: string;
+  omitAnnotations?: boolean;
 }
 
 function isValidURL(url: string | undefined): boolean {
@@ -40,20 +41,22 @@ export function richText(
   content: string,
   options: RichTextOptions = {}
 ): RichText {
-  const annotations: RichText['annotations'] = {
-    bold: false,
-    strikethrough: false,
-    underline: false,
-    italic: false,
-    code: false,
-    color: 'default' as const,
-    ...((options.annotations as RichText['annotations']) || {}),
-  };
+  const annotations = options.omitAnnotations
+    ? undefined
+    : {
+        bold: false,
+        strikethrough: false,
+        underline: false,
+        italic: false,
+        code: false,
+        color: 'default' as const,
+        ...((options.annotations as RichText['annotations']) || {}),
+      };
 
   if (options.type === 'equation')
     return {
       type: 'equation',
-      annotations,
+      ...(annotations && {annotations}),
       equation: {
         expression: content,
       },
@@ -61,7 +64,7 @@ export function richText(
   else
     return {
       type: 'text',
-      annotations,
+      ...(annotations && {annotations}),
       text: {
         content: content,
         link: isValidURL(options.url)
