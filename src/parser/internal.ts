@@ -141,6 +141,47 @@ function parseBlockquote(
   element: md.Blockquote,
   options: BlocksOptions
 ): notion.Block {
+  const firstChild = element.children[0];
+  const firstTextNode =
+    firstChild?.type === 'paragraph'
+      ? (firstChild as md.Paragraph).children[0]
+      : null;
+
+  if (firstTextNode?.type === 'text') {
+    const emojiData = notion.parseCalloutEmoji(firstTextNode.value);
+    if (emojiData) {
+      const paragraph = firstChild as md.Paragraph;
+      const richText = paragraph.children.flatMap(child => {
+        if (child === firstTextNode) {
+          const textWithoutEmoji = firstTextNode.value
+            .slice(emojiData.emoji.length)
+            .trimStart();
+          return textWithoutEmoji
+            ? (parseInline({
+                type: 'text',
+                value: textWithoutEmoji,
+              }) as notion.RichText[])
+            : [];
+        }
+        return parseInline(child) as notion.RichText[];
+      });
+
+      const children =
+        element.children.length > 1
+          ? element.children
+              .slice(1)
+              .flatMap(child => parseNode(child, options))
+          : [];
+
+      return notion.callout(
+        richText,
+        emojiData.emoji,
+        emojiData.color,
+        children
+      );
+    }
+  }
+
   const children = element.children.flatMap(child => parseNode(child, options));
   return notion.blockquote([], children);
 }

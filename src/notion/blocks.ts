@@ -1,4 +1,9 @@
-import {richText, supportedCodeLang, TableRowBlock} from './common';
+import {
+  richText,
+  supportedCodeLang,
+  TableRowBlock,
+  supportedCalloutColor,
+} from './common';
 import {AppendBlockChildrenParameters} from '@notionhq/client/build/src/api-endpoints';
 
 export type Block = AppendBlockChildrenParameters['children'][number];
@@ -182,6 +187,29 @@ export function equation(value: string): Block {
     type: 'equation',
     equation: {
       expression: value,
+    },
+  };
+}
+
+export function callout(
+  text: RichText[] = [],
+  emoji = '👍',
+  color = 'default',
+  children: Block[] = []
+): Block {
+  return {
+    object: 'block',
+    type: 'callout',
+    callout: {
+      rich_text: text.length ? text : [richText('')],
+      icon: {
+        type: 'emoji',
+        // @ts-expect-error Notion API accepts emoji strings but types are not exported
+        emoji,
+      },
+      color: color as supportedCalloutColor,
+      // @ts-expect-error Typings are not perfect
+      children,
     },
   };
 }

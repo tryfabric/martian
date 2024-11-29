@@ -162,3 +162,32 @@ export interface TableRowBlock {
   };
   object?: 'block';
 }
+export const SUPPORTED_CALLOUT_BLOCK_COLORS = [
+  'default',
+  'gray_background',
+  'brown_background',
+  'orange_background',
+  'yellow_background',
+  'green_background',
+  'blue_background',
+  'purple_background',
+  'pink_background',
+  'red_background',
+] as const;
+
+export type supportedCalloutColor =
+  typeof SUPPORTED_CALLOUT_BLOCK_COLORS[number];
+
+export function isSupportedCalloutColor(
+  color: string
+): color is supportedCalloutColor {
+  return (SUPPORTED_CALLOUT_BLOCK_COLORS as readonly string[]).includes(color);
+}
+
+export const SUPPORTED_EMOJI_COLOR_MAP: Record<string, supportedCalloutColor> =
+  {
+    '👍': 'green_background',
+    '📘': 'blue_background',
+    '🚧': 'yellow_background',
+    '❗': 'red_background',
+  };

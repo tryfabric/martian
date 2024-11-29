@@ -179,6 +179,62 @@ describe('gfm parser', () => {
     expect(actual).toStrictEqual(expected);
   });
 
+  it('should parse callout with emoji and formatting', () => {
+    const ast = md.root(
+      md.blockquote(
+        md.paragraph(
+          md.text('📘 '),
+          md.strong(md.text('Note:')),
+          md.text(' Important '),
+          md.emphasis(md.text('information'))
+        )
+      )
+    );
+
+    const actual = parseBlocks(ast, options);
+
+    const expected = [
+      notion.callout(
+        [
+          notion.richText('Note:', {annotations: {bold: true}}),
+          notion.richText(' Important '),
+          notion.richText('information', {annotations: {italic: true}}),
+        ],
+        '📘',
+        'blue_background',
+        []
+      ),
+    ];
+
+    expect(actual).toStrictEqual(expected);
+  });
+
+  it('should parse callout with children blocks', () => {
+    const ast = md.root(
+      md.blockquote(
+        md.paragraph(md.text('🚧 Under Construction')),
+        md.paragraph(md.text('More details:')),
+        md.unorderedList(md.listItem(md.paragraph(md.text('Work in progress'))))
+      )
+    );
+
+    const actual = parseBlocks(ast, options);
+
+    const expected = [
+      notion.callout(
+        [notion.richText('Under Construction')],
+        '🚧',
+        'yellow_background',
+        [
+          notion.paragraph([notion.richText('More details:')]),
+          notion.bulletedListItem([notion.richText('Work in progress')], []),
+        ]
+      ),
+    ];
+
+    expect(actual).toStrictEqual(expected);
+  });
+
   it('should parse list', () => {
     const ast = md.root(
       md.paragraph(md.text('hello')),

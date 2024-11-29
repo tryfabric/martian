@@ -18,6 +18,9 @@ Designed to make using the Notion SDK and API easier. Notion API version 1.0.
 - All headers (header levels >= 3 are treated as header level 3)
 - Code blocks, with language highlighting support
 - Block quotes
+  - Supports Notion callouts when blockquote starts with an emoji
+  - Automatically maps common emojis to appropriate background colors
+  - Preserves formatting and nested blocks within callouts
 - Tables
 - Equations
 - Images
@@ -85,6 +88,10 @@ hello _world_
 *** 
 ## heading2
 * [x] todo
+
+> 📘 **Note:** Important _information_
+
+> Some other blockquote
 `);
 ```
 
@@ -130,6 +137,11 @@ hello _world_
   },
   {
     "object": "block",
+    "type": "divider",
+    "divider": {}
+  },
+  {
+    "object": "block",
     "type": "heading_2",
     "heading_2": {
       "rich_text": [
@@ -172,10 +184,107 @@ hello _world_
       ],
       "checked": true
     }
+  },
+  {
+    "type": "callout",
+    "callout": {
+      "rich_text": [
+        {
+          "type": "text",
+          "text": {
+            "content": "Note:"
+          },
+          "annotations": {
+            "bold": true,
+            "strikethrough": false,
+            "underline": false,
+            "italic": false,
+            "code": false,
+            "color": "default"
+          }
+        },
+        {
+          "type": "text",
+          "text": {
+            "content": " Important "
+          }
+        },
+        {
+          "type": "text",
+          "text": {
+            "content": "information"
+          },
+          "annotations": {
+            "bold": false,
+            "strikethrough": false,
+            "underline": false,
+            "italic": true,
+            "code": false,
+            "color": "default"
+          }
+        }
+      ],
+      "icon": {
+        "type": "emoji",
+        "emoji": "📘"
+      },
+      "color": "blue_background"
+    }
+  },
+  {
+    "type": "quote",
+    "quote": {
+      "rich_text": [
+        {
+          "type": "text",
+          "text": {
+            "content": "Some other blockquote"
+          },
+          "annotations": {
+            "bold": false,
+            "strikethrough": false,
+            "underline": false,
+            "italic": false,
+            "code": false,
+            "color": "default"
+          }
+        }
+      ]
+    }
   }
 ]
 </pre>
 </details>
+
+### Working with blockquotes
+
+Martian supports two types of blockquotes:
+
+1. Standard blockquotes:
+
+```md
+> This is a regular blockquote
+> It can span multiple lines
+```
+
+2. Callouts (inspired by [ReadMe's markdown callouts](https://docs.readme.com/rdmd/docs/callouts)):
+
+```md
+> 📘 **Note:** This is a callout with a blue background
+> It supports all markdown formatting and can span multiple lines
+
+> ❗ **Warning:** This is a callout with a red background
+> Perfect for important warnings
+```
+
+Callouts are automatically detected when a blockquote starts with an emoji. The emoji determines the callout's background color:
+
+- 📘 (blue): Perfect for notes and information
+- 👍 (green): Success messages and tips
+- ❗ (red): Warnings and important notices
+- 🚧 (yellow): Work in progress or caution notices
+
+If a blockquote doesn't start with one of these emojis, it will be rendered as notion quote block.
 
 ### Working with Notion's limits
 
@@ -338,11 +447,8 @@ Error: Unsupported markdown element: {"type":"heading","depth":1,"children":[{"t
 </pre>
 </details>
 
-
-
 ---
 
 Built with 💙 by the team behind [Fabric](https://tryfabric.com).
 
 <img src="https://static.scarf.sh/a.png?x-pxid=79ae4e0a-7e48-4965-8a83-808c009aa47a" />
-
