@@ -161,7 +161,17 @@ function parseHeading(element: md.Heading): notion.Block {
 }
 
 function parseCode(element: md.Code): notion.Block {
-  const text = ensureLength(element.value);
+  // Create rich text without annotations field for code blocks
+  const text =
+    element.value.match(/[^]{1,2000}/g)?.map(
+      chunk =>
+        ({
+          type: 'text',
+          text: {
+            content: chunk,
+          },
+        } as notion.RichText)
+    ) || [];
   const lang = ensureCodeBlockLanguage(element.lang);
   return notion.code(text, lang);
 }

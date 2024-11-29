@@ -116,7 +116,17 @@ describe('gfm parser', () => {
 
     const expected = [
       notion.paragraph([notion.richText('hello')]),
-      notion.code([notion.richText('const foo = () => {}')], 'plain text'),
+      notion.code(
+        [
+          {
+            type: 'text',
+            text: {
+              content: 'const foo = () => {}',
+            },
+          } as notion.RichText,
+        ],
+        'plain text'
+      ),
     ];
     expect(actual).toStrictEqual(expected);
   });
@@ -131,7 +141,17 @@ describe('gfm parser', () => {
 
     const expected = [
       notion.paragraph([notion.richText('hello')]),
-      notion.code([notion.richText('public class Foo {}')], 'java'),
+      notion.code(
+        [
+          {
+            type: 'text',
+            text: {
+              content: 'public class Foo {}',
+            },
+          } as notion.RichText,
+        ],
+        'java'
+      ),
     ];
 
     expect(actual).toStrictEqual(expected);
@@ -147,7 +167,39 @@ describe('gfm parser', () => {
 
     const expected = [
       notion.paragraph([notion.richText('hello')]),
-      notion.code([notion.richText('const foo = () => {}')], 'plain text'),
+      notion.code(
+        [
+          {
+            type: 'text',
+            text: {
+              content: 'const foo = () => {}',
+            },
+          } as notion.RichText,
+        ],
+        'plain text'
+      ),
+    ];
+
+    expect(actual).toStrictEqual(expected);
+  });
+
+  it('should parse code block with rich text without annotations field', () => {
+    const ast = md.root(md.code('const foo = "bar";', 'typescript'));
+
+    const actual = parseBlocks(ast, options);
+
+    const expected = [
+      notion.code(
+        [
+          {
+            type: 'text',
+            text: {
+              content: 'const foo = "bar";',
+            },
+          } as notion.RichText,
+        ],
+        'typescript'
+      ),
     ];
 
     expect(actual).toStrictEqual(expected);

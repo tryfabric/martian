@@ -38,7 +38,17 @@ const hello = "hello";
 
       const expected = [
         notion.headingTwo([notion.richText('Code')]),
-        notion.code([notion.richText('const hello = "hello";')], 'plain text'),
+        notion.code(
+          [
+            {
+              type: 'text',
+              text: {
+                content: 'const hello = "hello";',
+              },
+            } as notion.RichText,
+          ],
+          'plain text'
+        ),
       ];
 
       expect(actual).toStrictEqual(expected);
@@ -55,7 +65,17 @@ const hello = "hello";
 
       const expected = [
         notion.headingTwo([notion.richText('Code')]),
-        notion.code([notion.richText('const hello = "hello";')], 'webassembly'),
+        notion.code(
+          [
+            {
+              type: 'text',
+              text: {
+                content: 'const hello = "hello";',
+              },
+            } as notion.RichText,
+          ],
+          'webassembly'
+        ),
       ];
 
       expect(actual).toStrictEqual(expected);
@@ -72,7 +92,17 @@ const hello = "hello";
 
       const expected = [
         notion.headingTwo([notion.richText('Code')]),
-        notion.code([notion.richText('const hello = "hello";')], 'typescript'),
+        notion.code(
+          [
+            {
+              type: 'text',
+              text: {
+                content: 'const hello = "hello";',
+              },
+            } as notion.RichText,
+          ],
+          'typescript'
+        ),
       ];
 
       expect(actual).toStrictEqual(expected);
