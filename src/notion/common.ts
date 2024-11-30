@@ -184,6 +184,34 @@ export function isSupportedCalloutColor(
   return (SUPPORTED_CALLOUT_BLOCK_COLORS as readonly string[]).includes(color);
 }
 
+export const SUPPORTED_GFM_ALERT_TYPES = [
+  'NOTE',
+  'TIP',
+  'IMPORTANT',
+  'WARNING',
+  'CAUTION',
+] as const;
+
+export type GfmAlertType = typeof SUPPORTED_GFM_ALERT_TYPES[number];
+
+export function isGfmAlertType(type: string): type is GfmAlertType {
+  return (SUPPORTED_GFM_ALERT_TYPES as readonly string[]).includes(type);
+}
+
+export const GFM_ALERT_MAP: Record<
+  GfmAlertType,
+  {
+    emoji: string;
+    color: supportedCalloutColor;
+  }
+> = {
+  NOTE: {emoji: 'ℹ️', color: 'blue_background'},
+  TIP: {emoji: '💡', color: 'green_background'},
+  IMPORTANT: {emoji: '❕', color: 'purple_background'},
+  WARNING: {emoji: '⚠️', color: 'yellow_background'},
+  CAUTION: {emoji: '❗', color: 'red_background'},
+} as const;
+
 export const SUPPORTED_EMOJI_COLOR_MAP: Record<string, supportedCalloutColor> =
   {
     '👍': 'green_background',

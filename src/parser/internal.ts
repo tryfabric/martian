@@ -148,37 +148,73 @@ function parseBlockquote(
       : null;
 
   if (firstTextNode?.type === 'text') {
-    const emojiData = notion.parseCalloutEmoji(firstTextNode.value);
-    if (emojiData) {
-      const paragraph = firstChild as md.Paragraph;
-      const richText = paragraph.children.flatMap(child => {
-        if (child === firstTextNode) {
-          const textWithoutEmoji = firstTextNode.value
-            .slice(emojiData.emoji.length)
-            .trimStart();
-          return textWithoutEmoji
-            ? (parseInline({
-                type: 'text',
-                value: textWithoutEmoji,
-              }) as notion.RichText[])
-            : [];
-        }
-        return parseInline(child) as notion.RichText[];
-      });
+    // Helper to parse subsequent blocks
+    const parseSubsequentBlocks = () =>
+      element.children.length > 1
+        ? element.children.slice(1).flatMap(child => parseNode(child, options))
+        : [];
 
-      const children =
-        element.children.length > 1
-          ? element.children
-              .slice(1)
-              .flatMap(child => parseNode(child, options))
-          : [];
+    // Check for GFM alert syntax first (both escaped and unescaped)
+    const firstLine = firstTextNode.value.split('\n')[0];
+    const gfmMatch = firstLine.match(
+      /^(?:\\\[|\[)!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]$/
+    );
+
+    if (gfmMatch && notion.isGfmAlertType(gfmMatch[1])) {
+      const alertType = gfmMatch[1];
+      const alertConfig = notion.GFM_ALERT_MAP[alertType];
+      const displayType =
+        alertType.charAt(0).toUpperCase() + alertType.slice(1).toLowerCase();
+
+      const children = [];
+      const contentLines = firstTextNode.value.split('\n').slice(1);
+
+      if (contentLines.length > 0) {
+        children.push(
+          notion.paragraph(
+            parseInline({
+              type: 'text',
+              value: contentLines.join('\n'),
+            })
+          )
+        );
+      }
+
+      children.push(...parseSubsequentBlocks());
 
       return notion.callout(
-        richText,
-        emojiData.emoji,
-        emojiData.color,
+        [notion.richText(displayType)],
+        alertConfig.emoji,
+        alertConfig.color,
         children
       );
+    }
+
+    // Check for emoji syntax if enabled
+    if (options.enableEmojiCallouts) {
+      const emojiData = notion.parseCalloutEmoji(firstTextNode.value);
+      if (emojiData) {
+        const paragraph = firstChild as md.Paragraph;
+        const textWithoutEmoji = firstTextNode.value
+          .slice(emojiData.emoji.length)
+          .trimStart();
+
+        // Process inline content from first paragraph
+        const richText = paragraph.children.flatMap(child =>
+          child === firstTextNode
+            ? textWithoutEmoji
+              ? parseInline({type: 'text', value: textWithoutEmoji})
+              : []
+            : parseInline(child)
+        );
+
+        return notion.callout(
+          richText,
+          emojiData.emoji,
+          emojiData.color,
+          parseSubsequentBlocks()
+        );
+      }
     }
   }
 
@@ -312,6 +348,7 @@ export interface CommonOptions {
 export interface BlocksOptions extends CommonOptions {
   /** Whether to render invalid images as text */
   strictImageUrls?: boolean;
+  enableEmojiCallouts?: boolean;
 }
 
 export function parseBlocks(
