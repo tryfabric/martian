@@ -205,9 +205,9 @@ export const GFM_ALERT_MAP: Record<
     color: supportedCalloutColor;
   }
 > = {
-  NOTE: {emoji: 'ℹ️', color: 'blue_background'},
+  NOTE: {emoji: '📘', color: 'blue_background'},
   TIP: {emoji: '💡', color: 'green_background'},
-  IMPORTANT: {emoji: '❕', color: 'purple_background'},
+  IMPORTANT: {emoji: '☝️', color: 'purple_background'},
   WARNING: {emoji: '⚠️', color: 'yellow_background'},
   CAUTION: {emoji: '❗', color: 'red_background'},
 } as const;

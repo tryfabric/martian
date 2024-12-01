@@ -352,7 +352,7 @@ describe('gfm parser', () => {
     const actual = parseBlocks(ast, options);
 
     const expected = [
-      notion.callout([notion.richText('Note')], 'ℹ️', 'blue_background', [
+      notion.callout([notion.richText('Note')], '📘', 'blue_background', [
         notion.paragraph([notion.richText('Important information')]),
       ]),
     ];
@@ -401,7 +401,7 @@ describe('gfm parser', () => {
     const expected = [
       notion.callout(
         [notion.richText('Important')],
-        '❕',
+        '☝️',
         'purple_background',
         [
           notion.paragraph([
