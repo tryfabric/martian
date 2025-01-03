@@ -1,9 +1,4 @@
-import {
-  richText,
-  supportedCodeLang,
-  TableRowBlock,
-  supportedCalloutColor,
-} from './common';
+import {richText, supportedCodeLang, TableRowBlock} from './common';
 import {AppendBlockChildrenParameters} from '@notionhq/client/build/src/api-endpoints';
 
 export type Block = AppendBlockChildrenParameters['children'][number];
@@ -20,6 +15,13 @@ export type EmojiRequest = ((Block & {
   object: 'block';
   type: 'callout';
 })['callout']['icon'] & {type: 'emoji'})['emoji'];
+export type ApiColor = Exclude<
+  (Block & {
+    object: 'block';
+    type: 'callout';
+  })['callout']['color'],
+  undefined
+>;
 
 export function divider(): Block {
   return {
@@ -198,7 +200,8 @@ export function equation(value: string): Block {
 export function callout(
   text: RichText[] = [],
   emoji: EmojiRequest = '👍',
-  color: supportedCalloutColor = 'default'
+  color: ApiColor = 'default',
+  children: Block[] = []
 ): Block {
   return {
     object: 'block',
@@ -209,6 +212,8 @@ export function callout(
         type: 'emoji',
         emoji,
       },
+      // @ts-expect-error Typings are not perfect
+      children,
       color,
     },
   };

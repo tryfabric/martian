@@ -1,8 +1,5 @@
-import {
-  supportedCodeLang,
-  supportedCalloutColor,
-  SUPPORTED_EMOJI_COLOR_MAP,
-} from './common';
+import {supportedCodeLang, SUPPORTED_EMOJI_COLOR_MAP} from './common';
+import type {EmojiRequest, ApiColor} from './blocks';
 import lm from './languageMap.json';
 
 export * from './blocks';
@@ -23,7 +20,7 @@ export function parseCodeLanguage(
  */
 export function parseCalloutEmoji(
   text: string
-): {emoji: string; color: supportedCalloutColor} | null {
+): {emoji: EmojiRequest; color: ApiColor} | null {
   if (!text) return null;
 
   // Get the first line of text
@@ -39,7 +36,7 @@ export function parseCalloutEmoji(
   const emoji = match[1];
 
   return {
-    emoji,
-    color: SUPPORTED_EMOJI_COLOR_MAP[emoji] || 'default',
+    emoji: emoji as EmojiRequest,
+    color: SUPPORTED_EMOJI_COLOR_MAP[emoji as EmojiRequest] || 'default',
   };
 }
