@@ -30,6 +30,18 @@ export function paragraph(text: RichText[]): Block {
   };
 }
 
+export function toggle(text: RichText[], children?: Block[]): Block {
+  return {
+    object: 'block',
+    type: 'toggle',
+    toggle: {
+      rich_text: text,
+      // @ts-expect-error Typings are not perfect
+      children,
+    },
+  };
+}
+
 export function code(
   text: RichText[],
   lang: supportedCodeLang = 'plain text'
