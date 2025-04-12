@@ -226,23 +226,16 @@ function parseHtml(node: md.HTML, options: BlocksOptions): notion.Block[] {
     if (summaryMatch && contentMatch) {
       const summaryText = summaryMatch[1].trim();
       const contentText = contentMatch[1].trim();
-      
-      // Parse the content as markdown
-      const contentRoot = unified()
-        .use(markdown)
-        .use(gfm)
-        .parse(contentText);
-      
-      const contentBlocks = parseBlocks(contentRoot as unknown as md.Root, options);
-      
+           
       return [
         notion.toggle(
-          [notion.richText(summaryText)],
-          contentBlocks as unknown as notion.BlockWithoutChildren[]
+          parseRichText(unified().use(markdown).use(gfm).parse(summaryText) as unknown as md.Root, options),
+          parseBlocks(unified().use(markdown).use(gfm).parse(contentText) as unknown as md.Root, options) as unknown as notion.BlockWithoutChildren[]
         )
       ];
     }
   }
+  
   return [];
 }
 

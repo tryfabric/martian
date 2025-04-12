@@ -8,6 +8,6 @@ Foo content
 </details>
 
 <details>
-<summary>Bar</summary>
+<summary>Bar _two_</summary>
 Bar with **bold** content
 </details>
