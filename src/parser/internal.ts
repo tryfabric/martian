@@ -221,21 +221,35 @@ function parseMath(node: md.Math): notion.Block {
 function parseHtml(node: md.HTML, options: BlocksOptions): notion.Block[] {
   if (node.value.includes('<details>')) {
     const summaryMatch = node.value.match(/<summary>(.*?)<\/summary>/);
-    const contentMatch = node.value.match(/<details>.*?<summary>.*?<\/summary>(.*?)<\/details>/s);
-    
+    const contentMatch = node.value.match(
+      /<details>.*?<summary>.*?<\/summary>(.*?)<\/details>/s
+    );
+
     if (summaryMatch && contentMatch) {
       const summaryText = summaryMatch[1].trim();
       const contentText = contentMatch[1].trim();
-           
+
       return [
         notion.toggle(
-          parseRichText(unified().use(markdown).use(gfm).parse(summaryText) as unknown as md.Root, options),
-          parseBlocks(unified().use(markdown).use(gfm).parse(contentText) as unknown as md.Root, options) as unknown as notion.BlockWithoutChildren[]
-        )
+          parseRichText(
+            unified()
+              .use(markdown)
+              .use(gfm)
+              .parse(summaryText) as unknown as md.Root,
+            options
+          ),
+          parseBlocks(
+            unified()
+              .use(markdown)
+              .use(gfm)
+              .parse(contentText) as unknown as md.Root,
+            options
+          ) as unknown as notion.BlockWithoutChildren[]
+        ),
       ];
     }
   }
-  
+
   return [];
 }
 

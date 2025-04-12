@@ -226,19 +226,23 @@ const hello = "hello";
       const expected = [
         notion.divider(),
         notion.headingThree([notion.richText('My title')]),
-        notion.toggle([notion.richText('Foo')], [
-          notion.paragraph([notion.richText('Foo content')]),
-        ]),
-        notion.toggle([
-          notion.richText('Bar '),
-          notion.richText('two', {annotations: {italic: true}}),
-        ], [
-          notion.paragraph([
-            notion.richText('Bar with '),
-            notion.richText('bold', {annotations: {bold: true}}),
-            notion.richText(' content'),
-          ]),
-        ]),
+        notion.toggle(
+          [notion.richText('Foo')],
+          [notion.paragraph([notion.richText('Foo content')])]
+        ),
+        notion.toggle(
+          [
+            notion.richText('Bar '),
+            notion.richText('two', {annotations: {italic: true}}),
+          ],
+          [
+            notion.paragraph([
+              notion.richText('Bar with '),
+              notion.richText('bold', {annotations: {bold: true}}),
+              notion.richText(' content'),
+            ]),
+          ]
+        ),
       ];
 
       expect(actual).toStrictEqual(expected);
