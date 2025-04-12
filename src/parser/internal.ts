@@ -215,6 +215,27 @@ function parseMath(node: md.Math): notion.Block {
   return notion.equation(textWithKatexNewlines);
 }
 
+function parseHtml(node: md.HTML, options: BlocksOptions): notion.Block[] {
+  if (node.value.includes('<details>')) {
+    const summaryMatch = node.value.match(/<summary>(.*?)<\/summary>/);
+    const contentMatch = node.value.match(/<details>.*?<summary>.*?<\/summary>(.*?)<\/details>/s);
+    
+    if (summaryMatch && contentMatch) {
+      const summaryText = summaryMatch[1].trim();
+      const contentText = contentMatch[1].trim();
+      
+      return [
+        notion.toggle(
+          [notion.richText(summaryText)],
+          [notion.paragraph([notion.richText(contentText)])]
+        )
+      ];
+    }
+  }
+  
+  return [];
+}
+
 function parseNode(
   node: md.FlowContent,
   options: BlocksOptions
@@ -243,6 +264,9 @@ function parseNode(
 
     case 'thematicBreak':
       return [notion.divider()];
+
+    case 'html':
+      return parseHtml(node as md.HTML, options);
 
     default:
       return [];

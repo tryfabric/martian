@@ -20,7 +20,7 @@ export function divider(): Block {
   };
 }
 
-export function paragraph(text: RichText[]): Block {
+export function paragraph(text: RichText[]): BlockWithoutChildren {
   return {
     object: 'block',
     type: 'paragraph',
@@ -30,14 +30,16 @@ export function paragraph(text: RichText[]): Block {
   };
 }
 
-export function toggle(text: RichText[], children?: Block[]): Block {
+export function toggle(
+  text: RichText[],
+  children: BlockWithoutChildren[] = []
+): Block {
   return {
     object: 'block',
     type: 'toggle',
     toggle: {
       rich_text: text,
-      // @ts-expect-error Typings are not perfect
-      children,
+      children: children.length ? children : undefined,
     },
   };
 }
