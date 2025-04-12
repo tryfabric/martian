@@ -9,10 +9,5 @@ Foo content
 
 <details>
 <summary>Bar</summary>
-Bar content
-</details>
-
-<details>
-<summary>Baz</summary>
-Baz content
+Bar with **bold** content
 </details>

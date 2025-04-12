@@ -3,6 +3,9 @@ import * as notion from '../notion';
 import path from 'path';
 import {URL} from 'url';
 import {isSupportedCodeLang, LIMITS} from '../notion';
+import unified from 'unified';
+import markdown from 'remark-parse';
+import gfm from 'remark-gfm';
 
 function ensureLength(text: string, copy?: object) {
   const chunks = text.match(/[^]{1,2000}/g) || [];
@@ -224,15 +227,22 @@ function parseHtml(node: md.HTML, options: BlocksOptions): notion.Block[] {
       const summaryText = summaryMatch[1].trim();
       const contentText = contentMatch[1].trim();
       
+      // Parse the content as markdown
+      const contentRoot = unified()
+        .use(markdown)
+        .use(gfm)
+        .parse(contentText);
+      
+      const contentBlocks = parseBlocks(contentRoot as unknown as md.Root, options);
+      
       return [
         notion.toggle(
           [notion.richText(summaryText)],
-          [notion.paragraph([notion.richText(contentText)])]
+          contentBlocks as unknown as notion.BlockWithoutChildren[]
         )
       ];
     }
   }
-  
   return [];
 }
 

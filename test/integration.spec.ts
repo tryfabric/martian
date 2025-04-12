@@ -230,10 +230,11 @@ const hello = "hello";
           notion.paragraph([notion.richText('Foo content')]),
         ]),
         notion.toggle([notion.richText('Bar')], [
-          notion.paragraph([notion.richText('Bar content')]),
-        ]),
-        notion.toggle([notion.richText('Baz')], [
-          notion.paragraph([notion.richText('Baz content')]),
+          notion.paragraph([
+            notion.richText('Bar with '),
+            notion.richText('bold', {annotations: {bold: true}}),
+            notion.richText(' content'),
+          ]),
         ]),
       ];
 
