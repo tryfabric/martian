@@ -191,13 +191,13 @@ function parseList(element: md.List, options: BlocksOptions): notion.Block[] {
   });
 }
 
-function parseTableCell(node: md.TableCell): notion.RichText[][] {
-  return [node.children.flatMap(child => parseInline(child))];
+function parseTableCell(node: md.TableCell): notion.RichText[] {
+  return node.children.flatMap(child => parseInline(child));
 }
 
-function parseTableRow(node: md.TableRow): notion.BlockWithoutChildren[] {
-  const tableCells = node.children.flatMap(child => parseTableCell(child));
-  return [notion.tableRow(tableCells)];
+function parseTableRow(node: md.TableRow): notion.TableRowBlock {
+  const cells = node.children.map(child => parseTableCell(child));
+  return notion.tableRow(cells);
 }
 
 function parseTable(node: md.Table): notion.Block[] {
@@ -206,7 +206,7 @@ function parseTable(node: md.Table): notion.Block[] {
     ? node.children[0].children.length
     : 0;
 
-  const tableRows = node.children.flatMap(child => parseTableRow(child));
+  const tableRows = node.children.map(child => parseTableRow(child));
   return [notion.table(tableRows, tableWidth)];
 }
 

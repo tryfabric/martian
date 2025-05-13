@@ -1,4 +1,4 @@
-import {richText, supportedCodeLang} from './common';
+import {richText, supportedCodeLang, TableRowBlock} from './common';
 import {AppendBlockChildrenParameters} from '@notionhq/client/build/src/api-endpoints';
 
 export type Block = AppendBlockChildrenParameters['children'][number];
@@ -155,10 +155,7 @@ export function toDo(
   };
 }
 
-export function table(
-  children: BlockWithoutChildren[],
-  tableWidth: number
-): Block {
+export function table(children: TableRowBlock[], tableWidth: number): Block {
   return {
     object: 'block',
     type: 'table',
@@ -170,7 +167,7 @@ export function table(
   };
 }
 
-export function tableRow(cells: RichText[][] = []): BlockWithoutChildren {
+export function tableRow(cells: RichText[][] = []): TableRowBlock {
   return {
     object: 'block',
     type: 'table_row',
