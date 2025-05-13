@@ -218,6 +218,35 @@ const hello = "hello";
 
       expect(actual).toStrictEqual(expected);
     });
+
+    it('should deal with toggles', () => {
+      const text = fs.readFileSync('test/fixtures/with-toggles.md').toString();
+      const actual = markdownToBlocks(text);
+
+      const expected = [
+        notion.divider(),
+        notion.headingThree([notion.richText('My title')]),
+        notion.toggle(
+          [notion.richText('Foo')],
+          [notion.paragraph([notion.richText('Foo content')])]
+        ),
+        notion.toggle(
+          [
+            notion.richText('Bar '),
+            notion.richText('two', {annotations: {italic: true}}),
+          ],
+          [
+            notion.paragraph([
+              notion.richText('Bar with '),
+              notion.richText('bold', {annotations: {bold: true}}),
+              notion.richText(' content'),
+            ]),
+          ]
+        ),
+      ];
+
+      expect(actual).toStrictEqual(expected);
+    });
   });
 
   describe('markdownToRichText', () => {
