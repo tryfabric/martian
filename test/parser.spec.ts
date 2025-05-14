@@ -179,6 +179,68 @@ describe('gfm parser', () => {
     expect(actual).toStrictEqual(expected);
   });
 
+  it('should parse callout with emoji and formatting', () => {
+    const ast = md.root(
+      md.blockquote(
+        md.paragraph(
+          md.text('📘 '),
+          md.strong(md.text('Note:')),
+          md.text(' Important '),
+          md.emphasis(md.text('information'))
+        )
+      )
+    );
+
+    const actual = parseBlocks(ast, {
+      ...options,
+      enableEmojiCallouts: true,
+    });
+
+    const expected = [
+      notion.callout(
+        [
+          notion.richText('Note:', {annotations: {bold: true}}),
+          notion.richText(' Important '),
+          notion.richText('information', {annotations: {italic: true}}),
+        ],
+        '📘',
+        'blue_background',
+        []
+      ),
+    ];
+
+    expect(actual).toStrictEqual(expected);
+  });
+
+  it('should parse callout with children blocks', () => {
+    const ast = md.root(
+      md.blockquote(
+        md.paragraph(md.text('🚧 Under Construction')),
+        md.paragraph(md.text('More details:')),
+        md.unorderedList(md.listItem(md.paragraph(md.text('Work in progress'))))
+      )
+    );
+
+    const actual = parseBlocks(ast, {
+      ...options,
+      enableEmojiCallouts: true,
+    });
+
+    const expected = [
+      notion.callout(
+        [notion.richText('Under Construction')],
+        '🚧',
+        'yellow_background',
+        [
+          notion.paragraph([notion.richText('More details:')]),
+          notion.bulletedListItem([notion.richText('Work in progress')], []),
+        ]
+      ),
+    ];
+
+    expect(actual).toStrictEqual(expected);
+  });
+
   it('should parse list', () => {
     const ast = md.root(
       md.paragraph(md.text('hello')),
@@ -274,6 +336,83 @@ describe('gfm parser', () => {
       notion.richText('b', {annotations: {italic: true, bold: true}}),
       notion.richText('c', {annotations: {bold: true}}),
       notion.richText('d', {url: 'https://example.com'}),
+    ];
+
+    expect(actual).toStrictEqual(expected);
+  });
+
+  it('should parse basic GFM alert', () => {
+    const ast = md.root(
+      md.blockquote(
+        md.paragraph(md.text('[!NOTE]')),
+        md.paragraph(md.text('Important information'))
+      )
+    );
+
+    const actual = parseBlocks(ast, options);
+
+    const expected = [
+      notion.callout([notion.richText('Note')], '📘', 'blue_background', [
+        notion.paragraph([notion.richText('Important information')]),
+      ]),
+    ];
+
+    expect(actual).toStrictEqual(expected);
+  });
+
+  it('should parse GFM alert with formatted content', () => {
+    const ast = md.root(
+      md.blockquote(
+        md.paragraph(md.text('[!TIP]')),
+        md.paragraph(md.text('This is a tip with '), md.inlineCode('code'))
+      )
+    );
+
+    const actual = parseBlocks(ast, options);
+
+    const expected = [
+      notion.callout([notion.richText('Tip')], '💡', 'green_background', [
+        notion.paragraph([
+          notion.richText('This is a tip with '),
+          notion.richText('code', {annotations: {code: true}}),
+        ]),
+      ]),
+    ];
+
+    expect(actual).toStrictEqual(expected);
+  });
+
+  it('should parse GFM alert with multiple paragraphs and lists', () => {
+    const ast = md.root(
+      md.blockquote(
+        md.paragraph(md.text('[!IMPORTANT]')),
+        md.paragraph(
+          md.strong(md.text('Note:')),
+          md.text(' Important '),
+          md.emphasis(md.text('information'))
+        ),
+        md.paragraph(md.text('Additional details')),
+        md.unorderedList(md.listItem(md.paragraph(md.text('Work in progress'))))
+      )
+    );
+
+    const actual = parseBlocks(ast, options);
+
+    const expected = [
+      notion.callout(
+        [notion.richText('Important')],
+        '☝️',
+        'purple_background',
+        [
+          notion.paragraph([
+            notion.richText('Note:', {annotations: {bold: true}}),
+            notion.richText(' Important '),
+            notion.richText('information', {annotations: {italic: true}}),
+          ]),
+          notion.paragraph([notion.richText('Additional details')]),
+          notion.bulletedListItem([notion.richText('Work in progress')], []),
+        ]
+      ),
     ];
 
     expect(actual).toStrictEqual(expected);

@@ -1,4 +1,4 @@
-import type {RichText} from './blocks';
+import type {RichText, EmojiRequest, ApiColor} from './blocks';
 
 /**
  * The limits that the Notion API uses for property values.
@@ -162,3 +162,40 @@ export interface TableRowBlock {
   };
   object?: 'block';
 }
+
+export const SUPPORTED_GFM_ALERT_TYPES = [
+  'NOTE',
+  'TIP',
+  'IMPORTANT',
+  'WARNING',
+  'CAUTION',
+] as const;
+
+export type GfmAlertType = typeof SUPPORTED_GFM_ALERT_TYPES[number];
+
+export function isGfmAlertType(type: string): type is GfmAlertType {
+  return (SUPPORTED_GFM_ALERT_TYPES as readonly string[]).includes(type);
+}
+
+export const GFM_ALERT_MAP: Record<
+  GfmAlertType,
+  {
+    emoji: EmojiRequest;
+    color: ApiColor;
+  }
+> = {
+  NOTE: {emoji: '📘', color: 'blue_background'},
+  TIP: {emoji: '💡', color: 'green_background'},
+  IMPORTANT: {emoji: '☝️', color: 'purple_background'},
+  WARNING: {emoji: '⚠️', color: 'yellow_background'},
+  CAUTION: {emoji: '❗', color: 'red_background'},
+} as const;
+
+export const SUPPORTED_EMOJI_COLOR_MAP: Partial<
+  Record<EmojiRequest, ApiColor>
+> = {
+  '👍': 'green_background',
+  '📘': 'blue_background',
+  '🚧': 'yellow_background',
+  '❗': 'red_background',
+};
