@@ -212,7 +212,7 @@ export function callout(
         type: 'emoji',
         emoji,
       },
-      // @ts-expect-error Typings are not perfect
+      // @ts-expect-error See https://github.com/makenotion/notion-sdk-js/issues/575
       children,
       color,
     },
