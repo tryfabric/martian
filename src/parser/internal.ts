@@ -3,6 +3,9 @@ import * as notion from '../notion';
 import path from 'path';
 import {URL} from 'url';
 import {isSupportedCodeLang, LIMITS} from '../notion';
+import unified from 'unified';
+import markdown from 'remark-parse';
+import gfm from 'remark-gfm';
 
 function ensureLength(text: string, copy?: object) {
   const chunks = text.match(/[^]{1,2000}/g) || [];
@@ -292,6 +295,41 @@ function parseMath(node: md.Math): notion.Block {
   return notion.equation(textWithKatexNewlines);
 }
 
+function parseHtml(node: md.HTML, options: BlocksOptions): notion.Block[] {
+  if (node.value.includes('<details>')) {
+    const summaryMatch = node.value.match(/<summary>(.*?)<\/summary>/);
+    const contentMatch = node.value.match(
+      /<details>.*?<summary>.*?<\/summary>(.*?)<\/details>/s
+    );
+
+    if (summaryMatch && contentMatch) {
+      const summaryText = summaryMatch[1].trim();
+      const contentText = contentMatch[1].trim();
+
+      return [
+        notion.toggle(
+          parseRichText(
+            unified()
+              .use(markdown)
+              .use(gfm)
+              .parse(summaryText) as unknown as md.Root,
+            options
+          ),
+          parseBlocks(
+            unified()
+              .use(markdown)
+              .use(gfm)
+              .parse(contentText) as unknown as md.Root,
+            options
+          ) as unknown as notion.BlockWithoutChildren[]
+        ),
+      ];
+    }
+  }
+
+  return [];
+}
+
 function parseNode(
   node: md.FlowContent,
   options: BlocksOptions,
@@ -320,6 +358,9 @@ function parseNode(
 
     case 'thematicBreak':
       return [notion.divider()];
+
+    case 'html':
+      return parseHtml(node as md.HTML, options);
 
     default:
       return [];

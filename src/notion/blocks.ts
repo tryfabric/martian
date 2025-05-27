@@ -31,12 +31,26 @@ export function divider(): Block {
   };
 }
 
-export function paragraph(text: RichText[]): Block {
+export function paragraph(text: RichText[]): BlockWithoutChildren {
   return {
     object: 'block',
     type: 'paragraph',
     paragraph: {
       rich_text: text,
+    },
+  };
+}
+
+export function toggle(
+  text: RichText[],
+  children: BlockWithoutChildren[] = []
+): Block {
+  return {
+    object: 'block',
+    type: 'toggle',
+    toggle: {
+      rich_text: text,
+      children: children.length ? children : undefined,
     },
   };
 }
