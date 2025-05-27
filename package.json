@@ -23,7 +23,7 @@
     "gfm"
   ],
   "engines": {
-    "node": ">=15"
+    "node": ">=20"
   },
   "author": "Richard Robinson",
   "license": "ISC",
