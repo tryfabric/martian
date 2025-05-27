@@ -11,8 +11,8 @@ describe('gfm parser', () => {
         md.text('Hello '),
         md.emphasis(md.text('world '), md.strong(md.text('foo'))),
         md.text('! '),
-        md.inlineCode('code')
-      )
+        md.inlineCode('code'),
+      ),
     );
 
     const actual = parseBlocks(ast, options);
@@ -43,10 +43,10 @@ describe('gfm parser', () => {
         md.link(
           'https://example.com',
           md.text('this is a '),
-          md.emphasis(md.text('url'))
+          md.emphasis(md.text('url')),
         ),
-        md.text(' end')
-      )
+        md.text(' end'),
+      ),
     );
 
     const actual = parseBlocks(ast, options);
@@ -72,7 +72,7 @@ describe('gfm parser', () => {
     const ast = md.root(
       md.paragraph(md.text('hello')),
       md.thematicBreak(),
-      md.paragraph(md.text('world'))
+      md.paragraph(md.text('world')),
     );
 
     const actual = parseBlocks(ast, options);
@@ -91,7 +91,7 @@ describe('gfm parser', () => {
       md.heading(1, md.text('heading1')),
       md.heading(2, md.text('heading2')),
       md.heading(3, md.text('heading3')),
-      md.heading(4, md.text('heading4'))
+      md.heading(4, md.text('heading4')),
     );
 
     const actual = parseBlocks(ast, options);
@@ -109,7 +109,7 @@ describe('gfm parser', () => {
   it('should parse code block and set the language to plain text if none is provided', () => {
     const ast = md.root(
       md.paragraph(md.text('hello')),
-      md.code('const foo = () => {}', undefined)
+      md.code('const foo = () => {}', undefined),
     );
 
     const actual = parseBlocks(ast);
@@ -124,7 +124,7 @@ describe('gfm parser', () => {
   it('should parse code block and set the proper language', () => {
     const ast = md.root(
       md.paragraph(md.text('hello')),
-      md.code('public class Foo {}', 'java')
+      md.code('public class Foo {}', 'java'),
     );
 
     const actual = parseBlocks(ast, options);
@@ -140,7 +140,7 @@ describe('gfm parser', () => {
   it('should parse code block and set the language to plain text if it is not supported by Notion', () => {
     const ast = md.root(
       md.paragraph(md.text('hello')),
-      md.code('const foo = () => {}', 'not-supported')
+      md.code('const foo = () => {}', 'not-supported'),
     );
 
     const actual = parseBlocks(ast);
@@ -156,8 +156,8 @@ describe('gfm parser', () => {
   it('should parse block quote', () => {
     const ast = md.root(
       md.blockquote(
-        md.heading(1, md.text('hello'), md.emphasis(md.text('world')))
-      )
+        md.heading(1, md.text('hello'), md.emphasis(md.text('world'))),
+      ),
     );
 
     const actual = parseBlocks(ast, options);
@@ -172,7 +172,7 @@ describe('gfm parser', () => {
               annotations: {italic: true},
             }),
           ]),
-        ]
+        ],
       ),
     ];
 
@@ -186,9 +186,9 @@ describe('gfm parser', () => {
           md.text('📘 '),
           md.strong(md.text('Note:')),
           md.text(' Important '),
-          md.emphasis(md.text('information'))
-        )
-      )
+          md.emphasis(md.text('information')),
+        ),
+      ),
     );
 
     const actual = parseBlocks(ast, {
@@ -205,7 +205,7 @@ describe('gfm parser', () => {
         ],
         '📘',
         'blue_background',
-        []
+        [],
       ),
     ];
 
@@ -217,8 +217,10 @@ describe('gfm parser', () => {
       md.blockquote(
         md.paragraph(md.text('🚧 Under Construction')),
         md.paragraph(md.text('More details:')),
-        md.unorderedList(md.listItem(md.paragraph(md.text('Work in progress'))))
-      )
+        md.unorderedList(
+          md.listItem(md.paragraph(md.text('Work in progress'))),
+        ),
+      ),
     );
 
     const actual = parseBlocks(ast, {
@@ -234,7 +236,7 @@ describe('gfm parser', () => {
         [
           notion.paragraph([notion.richText('More details:')]),
           notion.bulletedListItem([notion.richText('Work in progress')], []),
-        ]
+        ],
       ),
     ];
 
@@ -247,9 +249,9 @@ describe('gfm parser', () => {
       md.unorderedList(
         md.listItem(md.paragraph(md.text('a'))),
         md.listItem(md.paragraph(md.emphasis(md.text('b')))),
-        md.listItem(md.paragraph(md.strong(md.text('c'))))
+        md.listItem(md.paragraph(md.strong(md.text('c')))),
       ),
-      md.orderedList(md.listItem(md.paragraph(md.text('d'))))
+      md.orderedList(md.listItem(md.paragraph(md.text('d')))),
     );
 
     const actual = parseBlocks(ast, options);
@@ -272,7 +274,7 @@ describe('gfm parser', () => {
   it('should parse github extensions', () => {
     const ast = md.root(
       md.paragraph(
-        md.link('https://example.com', md.text('https://example.com'))
+        md.link('https://example.com', md.text('https://example.com')),
       ),
       md.paragraph(md.strikethrough(md.text('strikethrough content'))),
       md.table(
@@ -280,13 +282,13 @@ describe('gfm parser', () => {
           md.tableCell(md.text('a')),
           md.tableCell(md.text('b')),
           md.tableCell(md.text('c')),
-          md.tableCell(md.text('d'))
-        )
+          md.tableCell(md.text('d')),
+        ),
       ),
       md.unorderedList(
         md.checkedListItem(false, md.paragraph(md.text('to do'))),
-        md.checkedListItem(true, md.paragraph(md.text('done')))
-      )
+        md.checkedListItem(true, md.paragraph(md.text('done'))),
+      ),
     );
 
     const actual = parseBlocks(ast, options);
@@ -311,7 +313,7 @@ describe('gfm parser', () => {
             [notion.richText('d')],
           ]),
         ],
-        4
+        4,
       ),
       notion.toDo(false, [notion.richText('to do')]),
       notion.toDo(true, [notion.richText('done')]),
@@ -325,8 +327,8 @@ describe('gfm parser', () => {
       md.paragraph(
         md.text('a'),
         md.strong(md.emphasis(md.text('b')), md.text('c')),
-        md.link('https://example.com', text('d'))
-      )
+        md.link('https://example.com', text('d')),
+      ),
     );
 
     const actual = parseRichText(ast);
@@ -345,8 +347,8 @@ describe('gfm parser', () => {
     const ast = md.root(
       md.blockquote(
         md.paragraph(md.text('[!NOTE]')),
-        md.paragraph(md.text('Important information'))
-      )
+        md.paragraph(md.text('Important information')),
+      ),
     );
 
     const actual = parseBlocks(ast, options);
@@ -364,8 +366,8 @@ describe('gfm parser', () => {
     const ast = md.root(
       md.blockquote(
         md.paragraph(md.text('[!TIP]')),
-        md.paragraph(md.text('This is a tip with '), md.inlineCode('code'))
-      )
+        md.paragraph(md.text('This is a tip with '), md.inlineCode('code')),
+      ),
     );
 
     const actual = parseBlocks(ast, options);
@@ -389,11 +391,13 @@ describe('gfm parser', () => {
         md.paragraph(
           md.strong(md.text('Note:')),
           md.text(' Important '),
-          md.emphasis(md.text('information'))
+          md.emphasis(md.text('information')),
         ),
         md.paragraph(md.text('Additional details')),
-        md.unorderedList(md.listItem(md.paragraph(md.text('Work in progress'))))
-      )
+        md.unorderedList(
+          md.listItem(md.paragraph(md.text('Work in progress'))),
+        ),
+      ),
     );
 
     const actual = parseBlocks(ast, options);
@@ -411,7 +415,7 @@ describe('gfm parser', () => {
           ]),
           notion.paragraph([notion.richText('Additional details')]),
           notion.bulletedListItem([notion.richText('Work in progress')], []),
-        ]
+        ],
       ),
     ];
 

@@ -20,7 +20,7 @@ import remarkMath from 'remark-math';
 export function markdownToBlocks(
   body: string,
 
-  options?: BlocksOptions
+  options?: BlocksOptions,
 ): notion.Block[] {
   const root = unified().use(markdown).use(gfm).use(remarkMath).parse(body);
   return parseBlocks(root as unknown as md.Root, options);
@@ -35,7 +35,7 @@ export function markdownToBlocks(
  */
 export function markdownToRichText(
   text: string,
-  options?: RichTextOptions
+  options?: RichTextOptions,
 ): notion.RichText[] {
   const root = unified().use(markdown).use(gfm).parse(text);
   return parseRichText(root as unknown as md.Root, options);

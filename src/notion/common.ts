@@ -38,7 +38,7 @@ function isValidURL(url: string | undefined): boolean {
 
 export function richText(
   content: string,
-  options: RichTextOptions = {}
+  options: RichTextOptions = {},
 ): RichText {
   const annotations: RichText['annotations'] = {
     bold: false,
@@ -149,7 +149,7 @@ export const SUPPORTED_CODE_BLOCK_LANGUAGES = [
   'java/c/c++/c#',
 ] as const;
 
-export type supportedCodeLang = typeof SUPPORTED_CODE_BLOCK_LANGUAGES[number];
+export type supportedCodeLang = (typeof SUPPORTED_CODE_BLOCK_LANGUAGES)[number];
 
 export function isSupportedCodeLang(lang: string): lang is supportedCodeLang {
   return (SUPPORTED_CODE_BLOCK_LANGUAGES as readonly string[]).includes(lang);
@@ -171,7 +171,7 @@ export const SUPPORTED_GFM_ALERT_TYPES = [
   'CAUTION',
 ] as const;
 
-export type GfmAlertType = typeof SUPPORTED_GFM_ALERT_TYPES[number];
+export type GfmAlertType = (typeof SUPPORTED_GFM_ALERT_TYPES)[number];
 
 export function isGfmAlertType(type: string): type is GfmAlertType {
   return (SUPPORTED_GFM_ALERT_TYPES as readonly string[]).includes(type);

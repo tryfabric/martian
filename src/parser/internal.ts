@@ -20,7 +20,7 @@ function ensureCodeBlockLanguage(lang?: string) {
 
 function parseInline(
   element: md.PhrasingContent,
-  options?: notion.RichTextOptions
+  options?: notion.RichTextOptions,
 ): notion.RichText[] {
   const copy = {
     annotations: {
@@ -99,7 +99,7 @@ function parseImage(image: md.Image, options: BlocksOptions): notion.Block {
 
 function parseParagraph(
   element: md.Paragraph,
-  options: BlocksOptions
+  options: BlocksOptions,
 ): notion.Block[] {
   // Paragraphs can also be legacy 'TOC' from some markdown, so we check first
   const mightBeToc =
@@ -139,7 +139,7 @@ function parseParagraph(
 
 function parseBlockquote(
   element: md.Blockquote,
-  options: BlocksOptions
+  options: BlocksOptions,
 ): notion.Block {
   const firstChild = element.children[0];
   const firstTextNode =
@@ -157,7 +157,7 @@ function parseBlockquote(
     // Check for GFM alert syntax first (both escaped and unescaped)
     const firstLine = firstTextNode.value.split('\n')[0];
     const gfmMatch = firstLine.match(
-      /^(?:\\\[|\[)!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]$/
+      /^(?:\\\[|\[)!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]$/,
     );
 
     if (gfmMatch && notion.isGfmAlertType(gfmMatch[1])) {
@@ -175,8 +175,8 @@ function parseBlockquote(
             parseInline({
               type: 'text',
               value: contentLines.join('\n'),
-            })
-          )
+            }),
+          ),
         );
       }
 
@@ -186,7 +186,7 @@ function parseBlockquote(
         [notion.richText(displayType)],
         alertConfig.emoji,
         alertConfig.color,
-        children
+        children,
       );
     }
 
@@ -205,14 +205,14 @@ function parseBlockquote(
             ? textWithoutEmoji
               ? parseInline({type: 'text', value: textWithoutEmoji})
               : []
-            : parseInline(child)
+            : parseInline(child),
         );
 
         return notion.callout(
           richText,
           emojiData.emoji,
           emojiData.color,
-          parseSubsequentBlocks()
+          parseSubsequentBlocks(),
         );
       }
     }
@@ -255,7 +255,7 @@ function parseList(element: md.List, options: BlocksOptions): notion.Block[] {
     // Now process any of the children
     const parsedChildren: notion.BlockWithoutChildren[] = item.children.flatMap(
       child =>
-        parseNode(child, options) as unknown as notion.BlockWithoutChildren
+        parseNode(child, options) as unknown as notion.BlockWithoutChildren,
     );
 
     if (element.start !== null && element.start !== undefined) {
@@ -294,7 +294,7 @@ function parseMath(node: md.Math): notion.Block {
 
 function parseNode(
   node: md.FlowContent,
-  options: BlocksOptions
+  options: BlocksOptions,
 ): notion.Block[] {
   switch (node.type) {
     case 'heading':
@@ -353,7 +353,7 @@ export interface BlocksOptions extends CommonOptions {
 
 export function parseBlocks(
   root: md.Root,
-  options?: BlocksOptions
+  options?: BlocksOptions,
 ): notion.Block[] {
   const parsed = root.children.flatMap(item => parseNode(item, options || {}));
 
@@ -363,8 +363,8 @@ export function parseBlocks(
   if (parsed.length > LIMITS.PAYLOAD_BLOCKS)
     limitCallback(
       new Error(
-        `Resulting blocks array exceeds Notion limit (${LIMITS.PAYLOAD_BLOCKS})`
-      )
+        `Resulting blocks array exceeds Notion limit (${LIMITS.PAYLOAD_BLOCKS})`,
+      ),
     );
 
   return truncate ? parsed.slice(0, LIMITS.PAYLOAD_BLOCKS) : parsed;
@@ -381,7 +381,7 @@ export interface RichTextOptions extends CommonOptions {
 
 export function parseRichText(
   root: md.Root,
-  options?: RichTextOptions
+  options?: RichTextOptions,
 ): notion.RichText[] {
   const richTexts: notion.RichText[] = [];
 
@@ -398,8 +398,8 @@ export function parseRichText(
   if (richTexts.length > LIMITS.RICH_TEXT_ARRAYS)
     limitCallback(
       new Error(
-        `Resulting richTexts array exceeds Notion limit (${LIMITS.RICH_TEXT_ARRAYS})`
-      )
+        `Resulting richTexts array exceeds Notion limit (${LIMITS.RICH_TEXT_ARRAYS})`,
+      ),
     );
 
   return (
@@ -410,8 +410,8 @@ export function parseRichText(
     if (rt.text.content.length > LIMITS.RICH_TEXT.TEXT_CONTENT) {
       limitCallback(
         new Error(
-          `Resulting text content exceeds Notion limit (${LIMITS.RICH_TEXT.TEXT_CONTENT})`
-        )
+          `Resulting text content exceeds Notion limit (${LIMITS.RICH_TEXT.TEXT_CONTENT})`,
+        ),
       );
       if (truncate)
         rt.text.content =
@@ -425,8 +425,8 @@ export function parseRichText(
       // There's no point in truncating URLs
       limitCallback(
         new Error(
-          `Resulting text URL exceeds Notion limit (${LIMITS.RICH_TEXT.LINK_URL})`
-        )
+          `Resulting text URL exceeds Notion limit (${LIMITS.RICH_TEXT.LINK_URL})`,
+        ),
       );
 
     // Notion equations are not supported by this library, since they don't exist in Markdown
