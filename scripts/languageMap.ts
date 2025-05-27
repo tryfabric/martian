@@ -1,6 +1,6 @@
 // This script is responsible for generating src/notion/languageMap.json
 
-/* eslint-disable node/no-unpublished-import */
+/* eslint-disable n/no-unpublished-import */
 import l, {Language} from 'linguist-languages';
 import fs from 'fs';
 import path from 'path';
@@ -97,5 +97,5 @@ Object.entries(languages).forEach(([notionKey, value]) => {
 
 fs.writeFileSync(
   path.join(__dirname, '../src/notion/languageMap.json'),
-  JSON.stringify(map, null, 2)
+  JSON.stringify(map, null, 2),
 );

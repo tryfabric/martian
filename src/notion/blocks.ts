@@ -11,6 +11,17 @@ export type BlockWithoutChildren = Exclude<
 export type RichText = (Block & {
   type: 'paragraph';
 })['paragraph']['rich_text'][number];
+export type EmojiRequest = ((Block & {
+  object: 'block';
+  type: 'callout';
+})['callout']['icon'] & {type: 'emoji'})['emoji'];
+export type ApiColor = Exclude<
+  (Block & {
+    object: 'block';
+    type: 'callout';
+  })['callout']['color'],
+  undefined
+>;
 
 export function divider(): Block {
   return {
@@ -32,7 +43,7 @@ export function paragraph(text: RichText[]): Block {
 
 export function code(
   text: RichText[],
-  lang: supportedCodeLang = 'plain text'
+  lang: supportedCodeLang = 'plain text',
 ): Block {
   return {
     object: 'block',
@@ -46,7 +57,7 @@ export function code(
 
 export function blockquote(
   text: RichText[] = [],
-  children: Block[] = []
+  children: Block[] = [],
 ): Block {
   return {
     object: 'block',
@@ -113,7 +124,7 @@ export function headingThree(text: RichText[]): Block {
 
 export function bulletedListItem(
   text: RichText[],
-  children: BlockWithoutChildren[] = []
+  children: BlockWithoutChildren[] = [],
 ): Block {
   return {
     object: 'block',
@@ -127,7 +138,7 @@ export function bulletedListItem(
 
 export function numberedListItem(
   text: RichText[],
-  children: BlockWithoutChildren[] = []
+  children: BlockWithoutChildren[] = [],
 ): Block {
   return {
     object: 'block',
@@ -142,7 +153,7 @@ export function numberedListItem(
 export function toDo(
   checked: boolean,
   text: RichText[],
-  children: BlockWithoutChildren[] = []
+  children: BlockWithoutChildren[] = [],
 ): Block {
   return {
     object: 'block',
@@ -182,6 +193,28 @@ export function equation(value: string): Block {
     type: 'equation',
     equation: {
       expression: value,
+    },
+  };
+}
+
+export function callout(
+  text: RichText[] = [],
+  emoji: EmojiRequest = '👍',
+  color: ApiColor = 'default',
+  children: Block[] = [],
+): Block {
+  return {
+    object: 'block',
+    type: 'callout',
+    callout: {
+      rich_text: text.length ? text : [richText('')],
+      icon: {
+        type: 'emoji',
+        emoji,
+      },
+      // @ts-expect-error See https://github.com/makenotion/notion-sdk-js/issues/575
+      children,
+      color,
     },
   };
 }
