@@ -218,6 +218,30 @@ const hello = "hello";
 
       expect(actual).toStrictEqual(expected);
     });
+
+    it('should split paragraphs on hard line breaks', () => {
+      const text =
+        'You can _italicize_ or **bold** text.  \nThis is the second line of text.\nAnd this is in the same line';
+
+      const actual = markdownToBlocks(text);
+
+      const expected = [
+        notion.paragraph([
+          notion.richText('You can '),
+          notion.richText('italicize', {annotations: {italic: true}}),
+          notion.richText(' or '),
+          notion.richText('bold', {annotations: {bold: true}}),
+          notion.richText(' text.'),
+        ]),
+        notion.paragraph([
+          notion.richText(
+            'This is the second line of text.\nAnd this is in the same line',
+          ),
+        ]),
+      ];
+
+      expect(actual).toStrictEqual(expected);
+    });
   });
 
   describe('markdownToRichText', () => {
