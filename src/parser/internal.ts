@@ -131,7 +131,7 @@ function parseParagraph(
   });
 
   if (paragraphs.length) {
-    return [notion.paragraph(paragraphs.flat()), ...images];
+    return [...paragraphs.map(notion.paragraph), ...images];
   } else {
     return images;
   }
