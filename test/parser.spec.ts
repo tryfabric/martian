@@ -271,6 +271,39 @@ describe('gfm parser', () => {
     expect(actual).toStrictEqual(expected);
   });
 
+  it('should split paragraphs on hard line breaks', () => {
+    // Simulate markdown where a line ends with two spaces followed by \n, which renders as a hard line break.
+    // In the mdast AST this is represented as a `break` node within the paragraph.
+    const br: md.Break = {type: 'break'} as md.Break;
+
+    const ast = md.root(
+      md.paragraph(
+        md.text('You can '),
+        md.emphasis(md.text('italicize')),
+        md.text(' or '),
+        md.strong(md.text('bold')),
+        md.text(' text.'),
+        br,
+        md.text('This is the second line of text'),
+      ),
+    );
+
+    const actual = parseBlocks(ast, options);
+
+    const expected = [
+      notion.paragraph([
+        notion.richText('You can '),
+        notion.richText('italicize', {annotations: {italic: true}}),
+        notion.richText(' or '),
+        notion.richText('bold', {annotations: {bold: true}}),
+        notion.richText(' text.'),
+      ]),
+      notion.paragraph([notion.richText('This is the second line of text')]),
+    ];
+
+    expect(actual).toStrictEqual(expected);
+  });
+
   it('should parse github extensions', () => {
     const ast = md.root(
       md.paragraph(
