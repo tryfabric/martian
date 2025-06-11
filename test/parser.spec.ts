@@ -421,4 +421,23 @@ describe('gfm parser', () => {
 
     expect(actual).toStrictEqual(expected);
   });
+
+  it('should parse footnotes', () => {
+    const ast = md.root(
+      md.paragraph(md.text('Hello'), md.footnoteReference('1')),
+      md.footnoteDefinition('1', md.paragraph(md.text('Footnote content'))),
+    );
+
+    const actual = parseBlocks(ast, options);
+
+    const expected = [
+      notion.paragraph([notion.richText('Hello'), notion.richText('[1]')]),
+      notion.paragraph([
+        notion.richText('1. '),
+        notion.richText('Footnote content'),
+      ]),
+    ];
+
+    expect(actual).toStrictEqual(expected);
+  });
 });
