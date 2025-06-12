@@ -123,23 +123,34 @@ function parseParagraph(
   // Notion doesn't deal with inline images, so we need to parse them all out
   // of the paragraph into individual blocks
   const images: notion.Block[] = [];
-  const paragraphs: Array<notion.RichText[]> = [];
+  const paragraphs: notion.RichText[][] = [];
+  let currentParagraph: notion.RichText[] = [];
+
+  const pushParagraph = () => {
+    if (currentParagraph.length > 0) {
+      paragraphs.push(currentParagraph);
+      currentParagraph = [];
+    }
+  };
+
   element.children.forEach(item => {
     if (item.type === 'image') {
       images.push(parseImage(item, options));
-    } else {
-      const richText = parseInline(item) as notion.RichText[];
-      if (richText.length) {
-        paragraphs.push(richText);
-      }
+      return;
     }
+
+    if (item.type === 'break') {
+      pushParagraph();
+      return;
+    }
+
+    const richText = parseInline(item) as notion.RichText[];
+    currentParagraph.push(...richText);
   });
 
-  if (paragraphs.length) {
-    return [notion.paragraph(paragraphs.flat()), ...images];
-  } else {
-    return images;
-  }
+  pushParagraph();
+
+  return [...paragraphs.map(notion.paragraph), ...images];
 }
 
 function parseBlockquote(
