@@ -242,6 +242,25 @@ const hello = "hello";
 
       expect(actual).toStrictEqual(expected);
     });
+
+    it('should parse footnotes', () => {
+      const text = 'Here is some text.[^1]\n\n[^1]: Footnote definition.';
+
+      const actual = markdownToBlocks(text);
+
+      const expected = [
+        notion.paragraph([
+          notion.richText('Here is some text.'),
+          notion.richText('[1]'),
+        ]),
+        notion.paragraph([
+          notion.richText('1. '),
+          notion.richText('Footnote definition.'),
+        ]),
+      ];
+
+      expect(actual).toStrictEqual(expected);
+    });
   });
 
   describe('markdownToRichText', () => {
