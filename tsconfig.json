@@ -1,21 +1,21 @@
 {
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
-    "lib": [
-      "es2019"
-    ],
+    "types": ["vitest/globals"],
     "rootDir": ".",
     "outDir": "build",
     "strict": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "declaration": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*.ts",
     "test/**/*.ts",
     "scripts/**/*.ts",
-    "src/**/*.json"
+    "src/**/*.json",
+    "*.ts"
   ]
 }

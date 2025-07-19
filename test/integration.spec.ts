@@ -2,6 +2,7 @@ import {markdownToBlocks, markdownToRichText} from '../src';
 import * as notion from '../src/notion';
 import fs from 'fs';
 import {LIMITS} from '../src/notion';
+import {vi} from 'vitest';
 
 describe('markdown converter', () => {
   describe('markdownToBlocks', () => {
@@ -312,13 +313,13 @@ const hello = "hello";
       const text = Array(LIMITS.RICH_TEXT_ARRAYS + 10)
         .fill('a *a* ')
         .join('');
-      const spy = jest.fn();
+      const spy = vi.fn();
 
       markdownToRichText(text, {
         notionLimits: {onError: spy},
       });
 
-      expect(spy).toBeCalledTimes(1);
+      expect(spy).toHaveBeenCalledTimes(1);
       expect(spy).toHaveBeenCalledWith(expect.any(Error));
     });
 

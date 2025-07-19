@@ -1,7 +1,8 @@
 // This script is responsible for generating src/notion/languageMap.json
 
 /* eslint-disable n/no-unpublished-import */
-import l, {Language} from 'linguist-languages';
+import * as l from 'linguist-languages';
+import {Language} from 'linguist-languages';
 import fs from 'fs';
 import path from 'path';
 import {supportedCodeLang} from '../src/notion';
