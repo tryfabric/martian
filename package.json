@@ -6,7 +6,7 @@
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "scripts": {
-    "test": "jest",
+    "test": "vitest run",
     "lint": "gts lint",
     "clean": "gts clean",
     "precompile": "ts-node scripts/languageMap.ts",
@@ -28,21 +28,19 @@
   "author": "Richard Robinson",
   "license": "ISC",
   "dependencies": {
-    "@notionhq/client": "^3.1.2",
-    "remark-gfm": "^1.0.0",
-    "remark-math": "^4.0.0",
-    "remark-parse": "^9.0.0",
-    "unified": "^9.2.1"
+    "@notionhq/client": "^4.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
+    "remark-parse": "^11.0.0",
+    "unified": "^11.0.5"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.14",
-    "@types/node": "^20.17.51",
+    "@types/node": "^24.0.15",
     "gts": "^6.0.2",
-    "jest": "^29.7.0",
-    "linguist-languages": "^7.15.0",
-    "ts-jest": "^29.3.4",
-    "ts-node": "^10.0.0",
-    "typescript": "^5.8.3"
+    "linguist-languages": "^8.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
   },
   "publishConfig": {
     "access": "public"

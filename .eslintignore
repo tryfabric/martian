@@ -1,2 +1,2 @@
 build/
-jest.config.ts
+vitest.config.ts
