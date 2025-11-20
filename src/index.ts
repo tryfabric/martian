@@ -10,6 +10,7 @@ import {
 import type * as md from './markdown';
 import gfm from 'remark-gfm';
 import remarkMath from 'remark-math';
+import footnotes from 'remark-footnotes';
 
 /**
  * Parses Markdown content into Notion Blocks.
@@ -22,7 +23,12 @@ export function markdownToBlocks(
 
   options?: BlocksOptions,
 ): notion.Block[] {
-  const root = unified().use(markdown).use(gfm).use(remarkMath).parse(body);
+  const root = unified()
+    .use(markdown)
+    .use(gfm)
+    .use(remarkMath)
+    .use(footnotes)
+    .parse(body);
   return parseBlocks(root as unknown as md.Root, options);
 }
 
@@ -37,6 +43,6 @@ export function markdownToRichText(
   text: string,
   options?: RichTextOptions,
 ): notion.RichText[] {
-  const root = unified().use(markdown).use(gfm).parse(text);
+  const root = unified().use(markdown).use(gfm).use(footnotes).parse(text);
   return parseRichText(root as unknown as md.Root, options);
 }
