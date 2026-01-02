@@ -7,8 +7,8 @@ describe('markdown converter', () => {
   describe('markdownToBlocks', () => {
     it('should convert markdown to blocks', () => {
       const text = `
-hello _world_ 
-*** 
+hello _world_
+***
 ## heading2
 * [x] todo
 `;
@@ -85,7 +85,7 @@ const hello = "hello";
       const expected = [
         notion.headingOne([notion.richText('Images')]),
         notion.paragraph([notion.richText('This is a paragraph!')]),
-        notion.blockquote([], [notion.paragraph([notion.richText('Quote')])]),
+        notion.blockquote([notion.richText('Quote')], []),
         notion.paragraph([notion.richText('Paragraph')]),
         notion.image('https://url.com/image.jpg'),
         notion.table_of_contents(),
