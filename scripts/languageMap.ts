@@ -95,6 +95,9 @@ Object.entries(languages).forEach(([notionKey, value]) => {
   });
 });
 
+// Add direct mappings for Notion-native languages without linguist equivalents
+map['mermaid'] = 'mermaid';
+
 fs.writeFileSync(
   path.join(__dirname, '../src/notion/languageMap.json'),
   JSON.stringify(map, null, 2),

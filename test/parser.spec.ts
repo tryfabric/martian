@@ -137,6 +137,18 @@ describe('gfm parser', () => {
     expect(actual).toStrictEqual(expected);
   });
 
+  it('should parse code block with mermaid language', () => {
+    const ast = md.root(md.code('graph TD\n  A --> B', 'mermaid'));
+
+    const actual = parseBlocks(ast, options);
+
+    const expected = [
+      notion.code([notion.richText('graph TD\n  A --> B')], 'mermaid'),
+    ];
+
+    expect(actual).toStrictEqual(expected);
+  });
+
   it('should parse code block and set the language to plain text if it is not supported by Notion', () => {
     const ast = md.root(
       md.paragraph(md.text('hello')),
