@@ -23,6 +23,8 @@ import type {
   TableContent,
   Text,
   ThematicBreak,
+  FootnoteReference,
+  FootnoteDefinition,
 } from './types';
 
 export function text(value: string): Text {
@@ -189,5 +191,23 @@ export function tableCell(...children: PhrasingContent[]): RowContent {
   return {
     type: 'tableCell',
     children: children,
+  };
+}
+
+export function footnoteReference(identifier: string): FootnoteReference {
+  return {
+    type: 'footnoteReference',
+    identifier,
+  };
+}
+
+export function footnoteDefinition(
+  identifier: string,
+  ...children: FlowContent[]
+): FootnoteDefinition {
+  return {
+    type: 'footnoteDefinition',
+    identifier,
+    children,
   };
 }
