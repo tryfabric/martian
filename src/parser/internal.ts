@@ -227,6 +227,10 @@ function parseBlockquote(
         );
       }
     }
+
+    // It's a regular blockquote
+    const children = parseSubsequentBlocks();
+    return notion.blockquote([notion.richText(firstTextNode.value)], children);
   }
 
   const children = element.children.flatMap(child => parseNode(child, options));
