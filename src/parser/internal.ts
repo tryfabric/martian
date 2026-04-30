@@ -56,6 +56,11 @@ function parseInline(
     case 'inlineMath':
       return [notion.richText(element.value, {...copy, type: 'equation'})];
 
+    case 'footnoteReference': {
+      const ref = element as md.FootnoteReference;
+      return [notion.richText(`[${ref.identifier}]`, copy)];
+    }
+
     default:
       return [];
   }
@@ -328,6 +333,17 @@ function parseNode(
 
     case 'math':
       return [parseMath(node)];
+
+    case 'footnoteDefinition': {
+      const id = node.identifier;
+      const content: notion.RichText[] = [];
+      node.children.forEach(c => {
+        if (c.type === 'paragraph')
+          c.children.forEach(ch => content.push(...parseInline(ch)));
+      });
+
+      return [notion.paragraph([notion.richText(`${id}. `), ...content])];
+    }
 
     case 'thematicBreak':
       return [notion.divider()];

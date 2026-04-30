@@ -154,6 +154,7 @@ export type FlowContent =
   | Image
   | ImageReference
   | ThematicBreak
+  | FootnoteDefinition
   | Content
   | Table
   | Math;
@@ -162,7 +163,11 @@ export type Content = Definition | Paragraph;
 
 export type ListContent = ListItem;
 
-export type PhrasingContent = Link | LinkReference | StaticPhrasingContent;
+export type PhrasingContent =
+  | Link
+  | LinkReference
+  | StaticPhrasingContent
+  | FootnoteReference;
 
 export type StaticPhrasingContent =
   | Image
@@ -179,3 +184,14 @@ export type StaticPhrasingContent =
 export type TableContent = TableRow;
 
 export type RowContent = TableCell;
+
+export interface FootnoteReference extends Node {
+  type: 'footnoteReference';
+  identifier: string;
+}
+
+export interface FootnoteDefinition extends Parent {
+  type: 'footnoteDefinition';
+  identifier: string;
+  children: FlowContent[];
+}
